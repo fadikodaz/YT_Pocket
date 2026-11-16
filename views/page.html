@@ -38,108 +38,115 @@
       {{{crumbs}}}
 
       <div class="{{heroClass}}">
-      <section class="hero" id="hero" aria-labelledby="headline">
-        <h1 id="headline">{{h1}}</h1>
-        <p class="lead">{{lead}}</p>
+        <section class="hero" id="hero" aria-labelledby="headline">
+          <h1 id="headline">{{h1}}</h1>
+          <p class="lead">{{lead}}</p>
 
-        <div class="tool-card box">
-        <button class="paste-zone" id="pasteZone" type="button">
-          <span class="paste-title"
-            ><svg class="ic" aria-hidden="true"><use href="/icons.svg#i-clipboard-text" /></svg>Tap to paste link</span
-          >
-          <small>{{pasteHint}}</small>
-        </button>
+          <div class="tool-card box">
+            <button class="paste-zone" id="pasteZone" type="button">
+              <span class="paste-title"
+                ><svg class="ic" aria-hidden="true"><use href="/icons.svg#i-clipboard-text" /></svg>Tap to paste link</span
+              >
+              <small>{{pasteHint}}</small>
+            </button>
 
-        <div class="intake" id="dropZone">
-          <label class="visually-hidden" for="url">Video link</label>
-          <span class="field-wrap">
-            <input
-              id="url"
-              type="url"
-              inputmode="url"
-              autocomplete="off"
-              autocapitalize="off"
-              spellcheck="false"
-              enterkeyhint="go"
-              placeholder="Paste link here"
-              aria-describedby="error"
-            />
-            <button class="field-paste" id="pasteBtn" type="button" aria-label="Paste link">
-              <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-clipboard-text" /></svg
-              ><span class="field-paste-text">Paste</span>
+            <div class="intake" id="dropZone">
+              <label class="visually-hidden" for="url">Video link</label>
+              <span class="field-wrap">
+                <input
+                  id="url"
+                  type="url"
+                  inputmode="url"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  enterkeyhint="go"
+                  placeholder="Paste link here"
+                  aria-describedby="error"
+                />
+                <button class="field-paste" id="pasteBtn" type="button" aria-label="Paste link">
+                  <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-clipboard-text" /></svg
+                  ><span class="field-paste-text">Paste</span>
+                </button>
+                <button class="clear" id="clearBtn" type="button" aria-label="Clear link" hidden>
+                  <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-x" /></svg>
+                </button>
+              </span>
+              <button class="cta" id="fetchBtn" type="button">{{cta}}</button>
+            </div>
+            <div class="alert" id="error" role="alert" hidden></div>
+            <p class="terms">{{{terms}}}</p>
+          </div>
+          {{{proof}}}
+        </section>
+
+        {{{example}}}
+
+        <!-- The pasted video replaces the example card (same place, same page). -->
+        <section class="result box" id="result" aria-live="polite" aria-busy="false" aria-label="Your video" hidden>
+          <p class="ex-tag yours">Your video</p>
+          <div id="videoCard">
+            <div class="skeleton" id="skeleton" hidden>
+              <div class="sk sk-media"></div>
+              <div class="sk sk-line"></div>
+              <div class="sk sk-line short"></div>
+              <div class="sk sk-row"></div>
+              <div class="sk sk-row"></div>
+              <p class="sk-note">Getting the video details…</p>
+            </div>
+            <div id="videoBody" hidden>
+              <div class="screen" id="screen">
+                <img id="thumb" alt="" decoding="async" />
+                <span class="live" id="liveBadge" hidden>Live</span>
+              </div>
+              <div class="video-text">
+                <h2 id="title"></h2>
+                <p class="meta"><span id="site"></span> <span id="channel"></span> <span id="duration"></span></p>
+                <div class="video-actions">
+                  <button class="pill" id="thumbDl" type="button">
+                    <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-image" /></svg>
+                    <span id="thumbDlText">Save thumbnail</span>
+                  </button>
+                  <button class="link-btn card-clear" id="cardClear" type="button">Clear</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="sheet" id="sheet" aria-label="Choose a format" hidden>
+            <div class="tabs" role="group" aria-label="Format type">
+              <button id="tabVideo" type="button" aria-pressed="true">
+                <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-video-camera" /></svg>Video MP4
+              </button>
+              <button id="tabAudio" type="button" aria-pressed="false">
+                <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-music-notes" /></svg>Audio MP3
+              </button>
+            </div>
+            <p class="sheet-note" id="sheetNote" hidden></p>
+
+            <button class="cut-toggle" id="cutToggle" type="button" aria-expanded="false" aria-controls="cutPanel" hidden>
+              Cut a part
             </button>
-            <button class="clear" id="clearBtn" type="button" aria-label="Clear link" hidden>
-              <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-x" /></svg>
-            </button>
-          </span>
-          <button class="cta" id="fetchBtn" type="button">{{cta}}</button>
-        </div>
-        <div class="alert" id="error" role="alert" hidden></div>
-        <p class="terms">{{{terms}}}</p>
-        </div>
-        {{{proof}}}
-      </section>
-      {{{example}}}
+            <div class="cut" id="cutPanel" hidden>
+              <label>
+                From
+                <input id="cutStart" type="text" inputmode="numeric" autocomplete="off" placeholder="0:00" />
+              </label>
+              <label>
+                To
+                <input id="cutEnd" type="text" inputmode="numeric" autocomplete="off" />
+              </label>
+              <button class="link-btn" id="cutClear" type="button">Whole video</button>
+              <p class="cut-msg" id="cutMsg" aria-live="polite"></p>
+            </div>
+
+            <ul class="options" id="options"></ul>
+            <a class="sheet-switch" id="sheetSwitch" href="{{altPath}}" data-path="{{altPath}}" hidden>{{altLabel}}</a>
+          </section>
+        </section>
       </div>
 
       {{{tabs}}}
-
-      <section class="result" id="result" aria-live="polite" aria-busy="false" hidden>
-        <article class="video box" id="videoCard">
-          <div class="skeleton" id="skeleton" hidden>
-            <div class="sk sk-media"></div>
-            <div class="sk sk-line"></div>
-            <div class="sk sk-line short"></div>
-            <span class="visually-hidden">Loading video details</span>
-          </div>
-          <div id="videoBody" hidden>
-            <div class="screen" id="screen">
-              <img id="thumb" alt="" decoding="async" />
-              <span class="live" id="liveBadge" hidden>Live</span>
-            </div>
-            <div class="video-text">
-              <h2 id="title"></h2>
-              <p class="meta"><span id="site"></span> <span id="channel"></span> <span id="duration"></span></p>
-              <button class="pill" id="thumbDl" type="button">
-                <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-image" /></svg>
-                <span id="thumbDlText">Save thumbnail</span>
-              </button>
-            </div>
-          </div>
-        </article>
-
-        <section class="sheet box" id="sheet" aria-label="Choose a format" hidden>
-          <div class="grab" aria-hidden="true"></div>
-          <div class="tabs" role="group" aria-label="Format type">
-            <button id="tabVideo" type="button" aria-pressed="true">
-              <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-video-camera" /></svg>Video MP4
-            </button>
-            <button id="tabAudio" type="button" aria-pressed="false">
-              <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-music-notes" /></svg>Audio MP3
-            </button>
-          </div>
-          <p class="sheet-note" id="sheetNote" hidden></p>
-
-          <button class="cut-toggle" id="cutToggle" type="button" aria-expanded="false" aria-controls="cutPanel" hidden>
-            Cut a part
-          </button>
-          <div class="cut" id="cutPanel" hidden>
-            <label>
-              From
-              <input id="cutStart" type="text" inputmode="numeric" autocomplete="off" placeholder="0:00" />
-            </label>
-            <label>
-              To
-              <input id="cutEnd" type="text" inputmode="numeric" autocomplete="off" />
-            </label>
-            <button class="link-btn" id="cutClear" type="button">Whole video</button>
-            <p class="cut-msg" id="cutMsg" aria-live="polite"></p>
-          </div>
-
-          <ul class="options" id="options"></ul>
-          <a class="sheet-switch" id="sheetSwitch" href="{{altPath}}" data-path="{{altPath}}" hidden>{{altLabel}}</a>
-        </section>
-      </section>
 
       <div class="content" id="content">{{{content}}}</div>
 

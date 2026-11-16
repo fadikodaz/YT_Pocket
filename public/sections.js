@@ -27,13 +27,12 @@ for (const input of document.querySelectorAll('[data-len]')) {
 }
 
 // ------------------------------------------------- sticky paste button ----
-// Shown on phones once the link box has scrolled out of view; hidden while a
-// video is loaded (the page is then about that video, not the guides).
+// Shown on phones once the link box has scrolled out of view.
 const sticky = document.getElementById('stickyPaste');
 const card = document.querySelector('.tool-card');
 if (sticky && card && 'IntersectionObserver' in window) {
   new IntersectionObserver(([entry]) => {
-    sticky.hidden = entry.isIntersecting || document.body.classList.contains('has-video');
+    sticky.hidden = entry.isIntersecting;
   }).observe(card);
   sticky.addEventListener('click', () => {
     const url = document.getElementById('url');

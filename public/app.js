@@ -75,7 +75,9 @@ const state = {
   infoCache: new Map(), // url -> { info, at }
   jobs: new Map(), // `${info.key}|${value}[@start-end]` -> job
   rows: new Map(), // key -> row parts, for the visible tab only
+  showAll: false, // long quality list opened with "Show all"
 };
+const SHOW_FIRST = 4; // qualities shown before "Show all"
 
 // ------------------------------------------------------------------ utils --
 
@@ -175,6 +177,7 @@ const ICON = {
   check: 'i-check',
   retry: 'i-arrow-clockwise',
   close: 'i-x',
+  caret: 'i-caret-down',
 };
 
 const show = (n) => (n.hidden = false);
@@ -399,6 +402,12 @@ function showInfo(info, url) {
   if (!same) {
     el.thumb.alt = `Thumbnail: ${info.title || 'video'}`;
     el.thumb.onerror = null;
+    // Vertical videos (TikTok, Shorts, Reels) get a tall picture frame.
+    const v = (info.videoOptions || []).find((o) => o.width && o.height);
+    el.screen.classList.toggle('portrait', !!v && v.width < v.height);
+    el.thumb.onload = () => {
+      if (!v && el.thumb.naturalHeight > el.thumb.naturalWidth * 1.05) el.screen.classList.add('portrait');
+    };
     // No picture (some sites don't provide one): show the site name instead.
     const noPicture = !youtube && !info.thumbnail;
     el.screen.classList.toggle('empty', noPicture);
@@ -430,6 +439,7 @@ function showInfo(info, url) {
     }
     // Default tab: video, unless there are no video formats (e.g. SoundCloud).
     state.kind = (info.videoOptions || []).length ? state.kind : 'audio';
+    state.showAll = false;
     resetCut();
   }
 
@@ -441,7 +451,21 @@ function showInfo(info, url) {
   el.thumbDl.classList.toggle('big', THUMBNAIL_ONLY);
   if (!THUMBNAIL_ONLY) renderOptions();
   updateControls();
-  if (!same) announce(`Loaded: ${info.title}. ${THUMBNAIL_ONLY ? 'Save the thumbnail.' : 'Choose a format.'}`);
+  if (!same) {
+    announce(`Loaded: ${info.title}. ${THUMBNAIL_ONLY ? 'Save the thumbnail.' : 'Choose a format.'}`);
+    revealResult();
+  }
+}
+
+// Phones: the card sits under the link box; bring it into view if it starts
+// low on the screen.
+function revealResult() {
+  if (!matchMedia('(max-width: 899px)').matches) return;
+  const top = el.result.getBoundingClientRect().top;
+  if (top > innerHeight * 0.55 || top < 0) {
+    const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.result.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+  }
 }
 
 function resetResult() {
@@ -529,8 +553,10 @@ function audioOptions(info) {
 
 function videoName(o) {
   if (!o.height) return 'Best quality';
-  const res = o.height >= 2160 ? '4K' : o.height >= 1440 ? '2K' : `${o.height}p`;
-  return `${res}${o.fps >= 50 ? ` ${o.fps}fps` : ''}${o.height >= 720 && o.height < 1440 ? ' HD' : ''}`;
+  // Vertical videos (TikTok, Shorts, Reels) are named by their narrow side.
+  const p = o.width && o.width < o.height ? o.width : o.height;
+  const res = p >= 2160 ? '4K' : p >= 1440 ? '2K' : `${p}p`;
+  return `${res}${o.fps >= 50 ? ` ${o.fps}fps` : ''}${p >= 720 && p < 1440 ? ' HD' : ''}`;
 }
 
 function videoOptions(info) {
@@ -583,7 +609,28 @@ function renderOptions() {
   const focusedKey = document.activeElement?.closest?.('.opt')?.dataset.key;
   state.rows.clear();
   const opts = state.kind === 'video' ? videoOptions(info) : audioOptions(info);
-  el.options.replaceChildren(...opts.map((opt) => h('li', {}, makeRow(info, opt))));
+  const items = opts.map((opt) => h('li', {}, makeRow(info, opt)));
+  // Long lists: the top few, plus any row with a download, then "Show all".
+  let hidden = 0;
+  if (!state.showAll && items.length > SHOW_FIRST + 1) {
+    items.forEach((li, i) => {
+      if (i >= SHOW_FIRST && !state.jobs.has(li.firstChild.dataset.key)) {
+        li.hidden = true;
+        hidden += 1;
+      }
+    });
+  }
+  el.options.replaceChildren(...items);
+  if (hidden) {
+    const more = h('button', { type: 'button', class: 'show-all', text: `Show all ${items.length} qualities` });
+    more.prepend(svgIcon(ICON.caret));
+    more.addEventListener('click', () => {
+      state.showAll = true;
+      renderOptions();
+      el.options.children[SHOW_FIRST]?.querySelector('.opt')?.focus();
+    });
+    el.options.append(h('li', { class: 'show-all-row' }, more));
+  }
   for (const key of state.rows.keys()) paintRow(key);
   if (focusedKey) state.rows.get(focusedKey)?.btn.focus();
 }
@@ -698,6 +745,7 @@ el.cutClear.addEventListener('click', () => {
 function setKind(kind) {
   if (state.kind === kind || !state.info) return;
   state.kind = kind;
+  state.showAll = false;
   renderOptions();
 }
 el.tabVideo.addEventListener('click', () => setKind('video'));
@@ -1129,6 +1177,8 @@ el.clearBtn.addEventListener('click', () => {
   updateControls();
   el.url.focus();
 });
+// "Clear" in the card: same as the X in the link box (the example comes back).
+$('#cardClear')?.addEventListener('click', () => el.clearBtn.click());
 
 // Drag a link from another tab. A counter avoids flicker from child elements.
 let dragDepth = 0;
