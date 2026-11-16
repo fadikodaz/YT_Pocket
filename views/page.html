@@ -29,7 +29,7 @@
     <script type="module" src="/app.js"></script>
     {{{jsonld}}}
   </head>
-  <body data-tab="{{tab}}" data-platform="{{platform}}">
+  <body data-tab="{{tab}}" data-platform="{{platform}}" data-only="{{only}}">
     <a class="skip" href="#url">Skip to the link field</a>
 
     {{{header}}}
@@ -79,7 +79,7 @@
         </div>
         {{{proof}}}
       </section>
-      {{{sample}}}
+      {{{example}}}
       </div>
 
       {{{tabs}}}
@@ -137,6 +137,7 @@
           </div>
 
           <ul class="options" id="options"></ul>
+          <a class="sheet-switch" id="sheetSwitch" href="{{altPath}}" data-path="{{altPath}}" hidden>{{altLabel}}</a>
         </section>
       </section>
 

@@ -53,6 +53,10 @@ const el = {
 const BASE_TITLE = document.title;
 const CTA_LABEL = $('#fetchBtn').textContent.trim() || 'Get video'; // per page: Get MP3, Get thumbnail...
 const THUMBNAIL_ONLY = document.body.dataset.tab === 'thumbnail';
+// Single-format pages (YouTube to MP3 / to MP4) show only that format, plus a
+// link to the sister page for the other one.
+const ONLY = document.body.dataset.only || '';
+const sheetSwitch = $('#sheetSwitch');
 const INFO_TTL = 10 * 60 * 1000;
 const INFO_FRESH = 2 * 60 * 1000;
 const STORE_KEY = 'ytpocket.session.v1';
@@ -555,6 +559,15 @@ function renderOptions() {
   el.tabVideo.disabled = !hasVideo;
   el.tabAudio.disabled = audioOptions(info).length === 0;
   if (state.kind === 'audio' && el.tabAudio.disabled && hasVideo) state.kind = 'video';
+  // Lock to the page's format when that format exists for this video;
+  // otherwise fall back to showing both tabs.
+  const only = ONLY === 'video' ? hasVideo && ONLY : ONLY === 'audio' ? !el.tabAudio.disabled && ONLY : '';
+  if (only) state.kind = only;
+  el.tabVideo.parentElement.hidden = !!only;
+  if (sheetSwitch) {
+    sheetSwitch.hidden = !only || !sheetSwitch.dataset.path;
+    sheetSwitch.href = `${sheetSwitch.dataset.path}?url=${encodeURIComponent(state.url)}`;
+  }
   el.tabVideo.setAttribute('aria-pressed', String(state.kind === 'video'));
   el.tabAudio.setAttribute('aria-pressed', String(state.kind === 'audio'));
 

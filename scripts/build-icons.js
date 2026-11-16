@@ -51,6 +51,7 @@ const BOLD = [
   'arrow-up',
   'lock-simple',
   'prohibit',
+  'play',
 ];
 
 // Feature and illustration icons (duotone)
