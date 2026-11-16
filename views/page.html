@@ -37,10 +37,12 @@
     <main class="page" id="main">
       {{{crumbs}}}
 
-      <section class="hero box" id="hero" aria-labelledby="headline">
+      <div class="{{heroClass}}">
+      <section class="hero" id="hero" aria-labelledby="headline">
         <h1 id="headline">{{h1}}</h1>
         <p class="lead">{{lead}}</p>
 
+        <div class="tool-card box">
         <button class="paste-zone" id="pasteZone" type="button">
           <span class="paste-title"
             ><svg class="ic" aria-hidden="true"><use href="/icons.svg#i-clipboard-text" /></svg>Tap to paste link</span
@@ -74,7 +76,11 @@
         </div>
         <div class="alert" id="error" role="alert" hidden></div>
         <p class="terms">{{{terms}}}</p>
+        </div>
+        {{{proof}}}
       </section>
+      {{{sample}}}
+      </div>
 
       {{{tabs}}}
 
@@ -141,6 +147,9 @@
 
     {{{footer}}}
 
+    <button class="sticky-paste" id="stickyPaste" type="button" hidden>
+      <svg class="ic" aria-hidden="true"><use href="/icons.svg#i-arrow-up" /></svg>Paste a link
+    </button>
     <div class="toasts" id="toasts"></div>
     <div class="visually-hidden" id="announcer" aria-live="polite"></div>
   </body>

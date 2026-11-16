@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Option H: YouTube-only site with SEO content</title>
+    <link rel="stylesheet" href="mockups.css" />
+    <style>
+      @font-face {
+        font-family: 'Bricolage Grotesque';
+        src: url('../public/fonts/bricolage-latin.woff2') format('woff2');
+        font-weight: 200 800;
+      }
+      .app {
+        --bg: #ffd43b;
+        --card: #fffdf5;
+        --soft: #fff4c2;
+        --ink: #161616;
+        --muted: #55524a;
+        --pop: #ff5d8f;
+        --mint: #3ddc97;
+        --yt: #ff0000;
+        font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        font-weight: 500;
+        position: relative;
+      }
+      .app * {
+        box-sizing: border-box;
+      }
+      .box {
+        background: var(--card);
+        border: 3px solid var(--ink);
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      .new {
+        position: relative;
+      }
+      .new::before {
+        content: 'NEW';
+        position: absolute;
+        top: -12px;
+        right: 18px;
+        background: var(--pop);
+        border: 3px solid var(--ink);
+        border-radius: 99px;
+        font-size: 11px;
+        font-weight: 800;
+        padding: 1px 9px;
+        z-index: 2;
+      }
+      /* header */
+      .hdr {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 14px 0;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 800;
+        font-size: 22px;
+      }
+      .logo {
+        width: 32px;
+        height: 32px;
+        border: 3px solid var(--ink);
+        border-radius: 10px;
+        background: var(--pop);
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+      }
+      .menu {
+        display: flex;
+        gap: 2px;
+        margin-left: 10px;
+      }
+      .menu a {
+        padding: 7px 11px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 15px;
+      }
+      .menu a.cur {
+        background: var(--card);
+        border: 3px solid var(--ink);
+        padding: 4px 8px;
+      }
+      .hdr-end {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+      }
+      .ibtn {
+        height: 42px;
+        min-width: 42px;
+        padding: 0 10px;
+        border: 3px solid var(--ink);
+        border-radius: 12px;
+        background: var(--card);
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        box-shadow: 3px 3px 0 var(--ink);
+      }
+      /* hero */
+      .hero {
+        border-radius: 24px;
+        padding: 24px;
+        margin-top: 6px;
+      }
+      .hero h1 {
+        margin: 0 0 6px;
+        font-size: 40px;
+        line-height: 1.02;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .hero h1 em {
+        font-style: normal;
+        background: var(--ink);
+        color: var(--bg);
+        padding: 0 8px;
+        border-radius: 10px;
+      }
+      .hero p {
+        margin: 0 0 14px;
+        color: var(--muted);
+      }
+      .intake {
+        display: flex;
+        gap: 10px;
+      }
+      .field {
+        flex: 1;
+        height: 54px;
+        border: 3px solid var(--ink);
+        border-radius: 16px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        color: #77736a;
+      }
+      .cta {
+        height: 54px;
+        padding: 0 24px;
+        border-radius: 16px;
+        background: var(--ink);
+        color: #fff;
+        font-weight: 800;
+        display: grid;
+        place-items: center;
+      }
+      .terms {
+        margin: 10px 0 0 !important;
+        font-size: 12px;
+      }
+      .paste {
+        height: 92px;
+        border: 3px dashed var(--ink);
+        border-radius: 18px;
+        background: var(--soft);
+        display: grid;
+        place-content: center;
+        text-align: center;
+        font-weight: 800;
+        margin-bottom: 10px;
+      }
+      .paste small {
+        display: block;
+        font-weight: 500;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 16px 0 10px;
+      }
+      .tabs span {
+        padding: 6px 14px;
+        border: 3px solid var(--ink);
+        border-radius: 99px;
+        background: var(--card);
+        font-weight: 800;
+        font-size: 14px;
+      }
+      .tabs .on {
+        background: var(--pop);
+      }
+      /* byline + contents */
+      .byline {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        font-size: 13px;
+        font-weight: 700;
+        margin: 0 0 14px;
+      }
+      .byline span {
+        background: var(--card);
+        border: 2px solid var(--ink);
+        border-radius: 99px;
+        padding: 2px 10px;
+      }
+      .toc {
+        border-radius: 20px;
+        padding: 16px 20px;
+        margin-bottom: 18px;
+      }
+      .toc b {
+        display: block;
+        margin-bottom: 8px;
+      }
+      .toc ol {
+        margin: 0;
+        padding-left: 20px;
+        columns: 2;
+        column-gap: 30px;
+        font-weight: 700;
+      }
+      .toc li {
+        padding: 2px 0;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      /* sections */
+      .sec {
+        border-radius: 24px;
+        padding: 22px;
+        margin-bottom: 18px;
+      }
+      .sec h2 {
+        margin: 0 0 10px;
+        font-size: 26px;
+        line-height: 1.1;
+        font-weight: 800;
+      }
+      .sec h3 {
+        margin: 16px 0 6px;
+        font-size: 18px;
+        font-weight: 800;
+      }
+      .sec p {
+        margin: 0 0 10px;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+      .sec a,
+      .sec u {
+        color: var(--ink);
+        font-weight: 800;
+        text-decoration: underline;
+      }
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      .step {
+        border: 3px solid var(--ink);
+        border-radius: 18px;
+        background: #fff;
+        padding: 12px;
+      }
+      .step .pic {
+        height: 96px;
+        background: var(--soft);
+        border-radius: 12px;
+        border: 2px solid var(--ink);
+        margin-bottom: 8px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .step b {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .step p {
+        margin: 6px 0 0;
+        font-size: 14px;
+      }
+      .num {
+        width: 28px;
+        height: 28px;
+        border: 3px solid var(--ink);
+        border-radius: 50%;
+        background: var(--mint);
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+        flex: none;
+      }
+      /* device tabs */
+      .dev-tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .dev-tabs span {
+        padding: 6px 12px;
+        border: 3px solid var(--ink);
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 14px;
+        background: #fff;
+      }
+      .dev-tabs .on {
+        background: var(--mint);
+      }
+      .dev-steps {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        counter-reset: s;
+      }
+      .dev-steps li {
+        counter-increment: s;
+        display: flex;
+        gap: 10px;
+        padding: 7px 0;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+      .dev-steps li::before {
+        content: counter(s);
+        flex: none;
+        width: 26px;
+        height: 26px;
+        border: 3px solid var(--ink);
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--ink);
+        background: var(--soft);
+      }
+      .dev-steps b {
+        color: var(--ink);
+      }
+      /* tables */
+      .tbl {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 3px solid var(--ink);
+        border-radius: 16px;
+        overflow: hidden;
+        background: #fff;
+        font-size: 14px;
+        margin: 6px 0 10px;
+      }
+      .tbl th {
+        background: var(--ink);
+        color: var(--bg);
+        text-align: left;
+        padding: 9px 12px;
+        font-weight: 800;
+      }
+      .tbl td {
+        padding: 9px 12px;
+        border-top: 2px solid var(--soft);
+        vertical-align: top;
+      }
+      .tbl td:first-child {
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      .tbl tr.pick td {
+        background: #eafbf3;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 800;
+        border: 2px solid var(--ink);
+        border-radius: 99px;
+        padding: 0 7px;
+        margin-left: 6px;
+        background: var(--mint);
+        vertical-align: 1px;
+      }
+      .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .callout {
+        border: 3px dashed var(--ink);
+        border-radius: 16px;
+        padding: 12px 14px;
+        background: var(--soft);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      /* link formats */
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 8px 0 12px;
+      }
+      .chips code {
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 13px;
+        background: #fff;
+        border: 2px solid var(--ink);
+        border-radius: 10px;
+        padding: 4px 9px;
+      }
+      .chips.no code {
+        background: #ffe3ec;
+        text-decoration: line-through;
+        text-decoration-thickness: 2px;
+      }
+      /* troubleshooting */
+      .fix {
+        display: grid;
+        grid-template-columns: 1fr 1.3fr;
+        border: 3px solid var(--ink);
+        border-radius: 16px;
+        overflow: hidden;
+        background: #fff;
+        font-size: 14px;
+      }
+      .fix > div {
+        padding: 10px 12px;
+        border-top: 2px solid var(--soft);
+      }
+      .fix > div:nth-child(-n + 2) {
+        border-top: 0;
+        background: var(--ink);
+        color: var(--bg);
+        font-weight: 800;
+      }
+      .fix .msg {
+        font-weight: 800;
+        display: flex;
+        gap: 8px;
+      }
+      .fix .msg::before {
+        content: '!';
+        flex: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--ink);
+        border-radius: 50%;
+        background: var(--pop);
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+      }
+      /* safe + legal */
+      .cards3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .mini {
+        border: 3px solid var(--ink);
+        border-radius: 16px;
+        background: #fff;
+        padding: 12px 14px;
+      }
+      .mini b {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .mini p {
+        margin: 0;
+        font-size: 14px;
+      }
+      /* features */
+      .feats {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+      }
+      .feat {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .feat i {
+        flex: none;
+        width: 30px;
+        height: 30px;
+        border: 3px solid var(--ink);
+        border-radius: 10px;
+        background: var(--mint);
+        display: grid;
+        place-items: center;
+        font-style: normal;
+        font-weight: 800;
+      }
+      .feat b {
+        display: block;
+      }
+      .feat span {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      /* faq */
+      .faq div {
+        display: flex;
+        justify-content: space-between;
+        padding: 11px 0;
+        border-top: 2px solid var(--soft);
+        font-weight: 700;
+      }
+      .faq h2 + div {
+        border-top: 0;
+      }
+      .faq div::after {
+        content: '+';
+        width: 24px;
+        height: 24px;
+        border: 2px solid var(--ink);
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        flex: none;
+      }
+      .faq div.open::after {
+        content: '–';
+        background: var(--pop);
+      }
+      .faq p.ans {
+        margin: -4px 0 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+      }
+      .tool {
+        border: 3px solid var(--ink);
+        border-radius: 16px;
+        background: #fff;
+        padding: 10px 12px;
+        font-weight: 800;
+        box-shadow: 3px 3px 0 var(--ink);
+      }
+      .tool small {
+        display: block;
+        font-weight: 500;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      /* footer */
+      .foot {
+        background: var(--ink);
+        color: #fff8e1;
+        margin-top: 26px;
+        padding: 26px 0 20px;
+      }
+      .fcols {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr 1fr 1fr;
+        gap: 18px;
+      }
+      .fcols b {
+        display: block;
+        color: var(--bg);
+        margin-bottom: 6px;
+      }
+      .fcols div span {
+        display: block;
+        font-size: 14px;
+        padding: 3px 0;
+        color: #e9e3cf;
+      }
+      .fcols .later {
+        border: 2px dashed #8a8370;
+        border-radius: 12px;
+        padding: 8px 10px;
+        opacity: 0.7;
+      }
+      .fcols .later i {
+        font-style: normal;
+        font-size: 11px;
+        color: #bdb6a0;
+      }
+      .fine {
+        font-size: 12px;
+        color: #bdb6a0;
+        margin-top: 18px;
+      }
+      /* mobile */
+      .m .wrap {
+        padding: 0 14px;
+      }
+      .m .menu {
+        display: none;
+      }
+      .m .hero {
+        padding: 16px;
+        border-radius: 20px;
+      }
+      .m .hero h1 {
+        font-size: 30px;
+      }
+      .m .cta {
+        padding: 0 16px;
+      }
+      .m .steps,
+      .m .two,
+      .m .cards3 {
+        grid-template-columns: 1fr;
+      }
+      .m .feats {
+        grid-template-columns: 1fr 1fr;
+      }
+      .m .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .m .fcols {
+        grid-template-columns: 1fr 1fr;
+      }
+      .m .fix {
+        grid-template-columns: 1fr;
+      }
+      .m .fix > div:nth-child(2) {
+        display: none;
+      }
+      .m .fix .msg {
+        border-top: 3px solid var(--ink);
+        background: var(--soft);
+      }
+      .m .toc ol {
+        columns: 1;
+      }
+      .m .tabs {
+        flex-wrap: nowrap;
+        overflow: hidden;
+      }
+      .m .tabs span {
+        white-space: nowrap;
+      }
+      .m .sec {
+        padding: 16px;
+      }
+      .m .sec h2 {
+        font-size: 22px;
+      }
+      .m .tbl {
+        font-size: 13px;
+      }
+      .m .tbl td,
+      .m .tbl th {
+        padding: 8px;
+      }
+      .m .hide-m {
+        display: none;
+      }
+      .scroll {
+        will-change: transform;
+      }
+      .desk {
+        width: 1280px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 8px solid #111;
+        box-shadow: 0 10px 30px rgb(0 0 0 / 0.18);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="mock-head">
+      <h1>Option H: YouTube-only site with SEO content (homepage)</h1>
+      <p>
+        The YouTube domain shows only YouTube tools. The header menu becomes five flat links. Sections marked
+        <b>NEW</b> are the SEO content: last-updated line, contents list, a guide for each device, quality tables with
+        file sizes, supported link formats, troubleshooting that uses the app's exact error messages, a safety and
+        legal guide, and a longer FAQ. The dashed "Partner tools" column in the footer stays hidden until a partner
+        domain exists. The text is the proposed real wording. <a href="index.html">Back to all options</a>
+      </p>
+    </header>
+
+    <div class="frames">
+      <figure>
+        <figcaption>Desktop: full page</figcaption>
+        <div class="desk"><div class="app" id="desktop"></div></div>
+      </figure>
+    </div>
+    <div class="frames" id="phones"></div>
+
+    <script>
+      const header = (mobile) => `
+        <div class="wrap"><div class="hdr">
+          <div class="brand"><span class="logo">↓</span>YTPocket</div>
+          <nav class="menu">
+            <a class="cur">Video</a><a>YouTube to MP3</a><a>YouTube to MP4</a><a>Shorts</a><a>Thumbnail</a>
+          </nav>
+          <div class="hdr-end"><span class="ibtn">☾</span>${mobile ? '<span class="ibtn">☰</span>' : ''}</div>
+        </div></div>`;
+
+      const page = (mobile) => `
+        ${header(mobile)}
+        <div class="wrap">
+          <section class="hero box">
+            <h1>Download <em>YouTube</em> videos and MP3</h1>
+            <p>Free. No sign-up. MP4 up to 4K, or MP3 up to 320 kbps.</p>
+            ${mobile ? '<div class="paste">Tap to paste link<small>or share from the YouTube app</small></div>' : ''}
+            <div class="intake"><div class="field">Paste YouTube link here</div><div class="cta">Get video</div></div>
+            <p class="terms">By using YTPocket you accept the <u>Terms</u> and <u>Privacy Policy</u>.</p>
+          </section>
+          <div class="tabs"><span class="on">Video</span><span>To MP3</span><span>To MP4</span><span>Shorts</span><span>Thumbnail</span></div>
+
+          <div class="byline new"><span>Updated 16 November 2026</span><span>Tested on iPhone, Android, Windows and Mac</span></div>
+
+          <nav class="toc box new" data-at="toc"><b>On this page</b><ol>
+            <li>How to download a YouTube video</li><li>On iPhone, Android, Windows or Mac</li>
+            <li>Which quality to pick</li><li>MP3 quality: 128 vs 192 vs 320 kbps</li>
+            <li>Links that work</li><li>If something goes wrong</li>
+            <li>Is it safe and legal?</li><li>Questions and answers</li></ol></nav>
+
+          <section class="sec box">
+            <h2>How to download a YouTube video</h2>
+            <p>Paste a YouTube link and choose how to save it: as an MP4 video in any quality the video has, up to 4K and 60 fps, or as an MP3. Files get the video’s title and picture built in, so they look right on your phone.</p>
+            <div class="steps">
+              <div class="step"><div class="pic">[Share → Copy link]</div><b><span class="num">1</span>Copy the link</b><p>In YouTube, tap Share, then Copy link.</p></div>
+              <div class="step"><div class="pic">[Paste + Get video]</div><b><span class="num">2</span>Paste it here</b><p>Paste the link above and tap Get video.</p></div>
+              <div class="step"><div class="pic">[Quality list]</div><b><span class="num">3</span>Pick a quality</b><p>The file saves to your device by itself.</p></div>
+            </div>
+          </section>
+
+          <section class="sec box new">
+            <h2 data-at="device">Download YouTube videos on iPhone, Android, Windows or Mac</h2>
+            <p>YTPocket runs in your browser, so there’s nothing to install on any device. The only difference is where the file ends up.</p>
+            <div class="dev-tabs"><span class="on">iPhone / iPad</span><span>Android</span><span>Windows</span><span>Mac</span></div>
+            <ol class="dev-steps">
+              <li><span>In the YouTube app, tap <b>Share</b>, then <b>Copy link</b>.</span></li>
+              <li><span>Open <b>Safari</b>, go to YTPocket and tap <b>Tap to paste link</b>.</span></li>
+              <li><span>Pick a quality. Safari asks to download the file; tap <b>Download</b>.</span></li>
+              <li><span>Open the <b>Files</b> app, then <b>Downloads</b>. To put a video in Photos, tap Share, then <b>Save Video</b>.</span></li>
+            </ol>
+          </section>
+
+          <section class="sec box new">
+            <h2 data-at="quality">Which YouTube video quality should you pick?</h2>
+            <p>Higher quality looks sharper but makes much bigger files. Sizes below are typical for a 10-minute video; YTPocket shows the real size for each quality before you download.</p>
+            <table class="tbl">
+              <tr><th>Quality</th><th>Best for</th><th>10-min size</th><th class="hide-m">Plays on</th></tr>
+              <tr><td>360p</td><td>Saving data, small phones</td><td>≈ 20 MB</td><td class="hide-m">Everything</td></tr>
+              <tr><td>720p</td><td>Phones and tablets</td><td>≈ 60 MB</td><td class="hide-m">Everything</td></tr>
+              <tr class="pick"><td>1080p<span class="tag">Best pick</span></td><td>Laptops, most TVs</td><td>≈ 150 MB</td><td class="hide-m">Everything</td></tr>
+              <tr><td>1440p</td><td>Big monitors</td><td>≈ 400 MB</td><td class="hide-m">Browsers and VLC</td></tr>
+              <tr><td>4K</td><td>Large TVs, editing</td><td>1 GB +</td><td class="hide-m">Browsers and VLC</td></tr>
+            </table>
+            <div class="callout"><b>Why do some qualities say “Plays in browsers and VLC”?</b> Above 1080p, YouTube only offers newer video formats (VP9 and AV1). Chrome, Firefox and VLC play them, but some older phones and TVs can’t. 1080p and below are saved as H.264, which plays everywhere.</div>
+          </section>
+
+          <section class="sec box new">
+            <h2>YouTube to MP3 quality: 128 vs 192 vs 320 kbps</h2>
+            <div class="two">
+              <div>
+                <p>YouTube streams sound at roughly 128 to 160 kbps. Converting to a higher MP3 bitrate makes a bigger file, but it can’t add detail that wasn’t in the original. That’s why <b>192 kbps</b> is our default: it keeps everything YouTube sends.</p>
+                <p>Want no conversion at all? Pick <b>M4A original</b>: YouTube’s own sound, saved exactly as it is.</p>
+                <p>More on the <a>YouTube to MP3 converter</a> page.</p>
+              </div>
+              <table class="tbl">
+                <tr><th>Option</th><th>Size per minute</th><th>Good for</th></tr>
+                <tr><td>128 kbps</td><td>≈ 1 MB</td><td>Podcasts, talks</td></tr>
+                <tr class="pick"><td>192 kbps<span class="tag">Default</span></td><td>≈ 1.4 MB</td><td>Music</td></tr>
+                <tr><td>320 kbps</td><td>≈ 2.4 MB</td><td>Players that need it</td></tr>
+                <tr><td>M4A original</td><td>≈ 1 MB</td><td>Best quality, iPhone</td></tr>
+              </table>
+            </div>
+          </section>
+
+          <section class="sec box new">
+            <h2 data-at="links">YouTube links that work</h2>
+            <p>Copy the link from the Share button or the address bar. All of these work:</p>
+            <div class="chips">
+              <code>youtube.com/watch?v=…</code><code>youtu.be/…</code><code>youtube.com/shorts/…</code>
+              <code>m.youtube.com/…</code><code>music.youtube.com/…</code><code>youtube.com/live/… (after the stream)</code>
+              <code>11-character video ID</code>
+            </div>
+            <p>These can’t be downloaded:</p>
+            <div class="chips no"><code>Whole playlists</code><code>Private videos</code><code>Members-only</code><code>Age-restricted</code><code>Live right now</code></div>
+          </section>
+
+          <section class="sec box">
+            <h2>What you get</h2>
+            <div class="feats">
+              <div class="feat"><i>▶</i><div><b>Every quality</b><span>144p up to 4K, 60 fps</span></div></div>
+              <div class="feat"><i>♪</i><div><b>MP3 too</b><span>Just open the Audio tab</span></div></div>
+              <div class="feat"><i>▢</i><div><b>Any device</b><span>Phone or computer</span></div></div>
+              <div class="feat"><i>∞</i><div><b>Free, no limits</b><span>No sign-up, no app</span></div></div>
+              <div class="feat"><i>✓</i><div><b>Private</b><span>Files deleted in 15 min</span></div></div>
+            </div>
+          </section>
+
+          <section class="sec box new">
+            <h2 data-at="fix">If a YouTube download doesn’t work</h2>
+            <p>These are the exact messages YTPocket shows, and what to do about each.</p>
+            <div class="fix">
+              <div>You see</div><div>What to do</div>
+              <div class="msg">This link isn’t supported.</div><div>Copy the link of a single video (Share, then Copy link), not a channel or playlist.</div>
+              <div class="msg">This video is private.</div><div>Only public or unlisted videos can be saved. Ask the uploader to make it unlisted.</div>
+              <div class="msg">This video is age-restricted.</div><div>These need a signed-in YouTube account, so they can’t be downloaded here.</div>
+              <div class="msg">Live streams can’t be downloaded while they are live.</div><div>Wait until the stream ends. The recording usually works within a few minutes.</div>
+              <div class="msg">That file would be too large.</div><div>Pick a lower quality: 1080p instead of 4K usually fixes it.</div>
+              <div class="msg">The server is busy right now.</div><div>Many people are downloading at once. Wait a minute and try again.</div>
+            </div>
+          </section>
+
+          <section class="sec box new">
+            <h2 data-at="safe">Is YTPocket safe and legal?</h2>
+            <div class="cards3">
+              <div class="mini"><b>Nothing to install</b><p>It runs in your browser over HTTPS. No app, no extension, no sign-up.</p></div>
+              <div class="mini"><b>We don’t keep your files</b><p>Files exist on our server only to send them to you and are deleted after 15 minutes.</p></div>
+              <div class="mini"><b>Download what you’re allowed to</b><p>Your own videos, Creative Commons and public-domain videos, or anything you have permission to save.</p></div>
+            </div>
+            <p style="margin-top:12px">Read more in our <a>Terms</a>, <a>Privacy Policy</a> and <a>Copyright policy</a>.</p>
+          </section>
+
+          <section class="sec box faq">
+            <h2>Questions and answers</h2>
+            <div class="open">Is YTPocket free?</div>
+            <p class="ans">Yes. There’s no sign-up, no app to install and no limit on how many videos you save.</p>
+            <div>How do I download a YouTube video to my phone gallery?</div>
+            <div>Can I download a whole playlist?</div>
+            <div>What is the best quality for YouTube to MP3?</div>
+            <div>How long can the video be?</div>
+            <div>Why is 4K not playing on my TV?</div>
+            <div>Do you keep my videos or links?</div>
+            <div>Is it legal to download YouTube videos?</div>
+          </section>
+
+          <section class="sec box">
+            <h2>More YouTube tools</h2>
+            <div class="grid">
+              <div class="tool">YouTube to MP3<small>Just the sound</small></div>
+              <div class="tool">YouTube to MP4<small>Pick a quality</small></div>
+              <div class="tool">Shorts downloader<small>Vertical videos</small></div>
+              <div class="tool">Thumbnail<small>HD cover image</small></div>
+              <div class="tool">Video downloader<small>MP4 up to 4K</small></div>
+            </div>
+          </section>
+        </div>
+        <footer class="foot"><div class="wrap">
+          <div class="fcols">
+            <div><div class="brand" style="color:#fff8e1"><span class="logo">↓</span>YTPocket</div><span style="margin-top:8px">Free YouTube video and MP3 downloader.</span></div>
+            <div><b>YouTube tools</b><span>Video downloader</span><span>YouTube to MP3</span><span>YouTube to MP4</span><span>Shorts</span><span>Thumbnail</span></div>
+            <div><b>YTPocket</b><span>About</span><span>Terms</span><span>Privacy</span><span>Copyright (DMCA)</span><span>Contact</span></div>
+            <div class="later"><b>Partner tools</b><i>Hidden until partner domains exist</i><span>TikTok downloader ↗</span><span>Facebook downloader ↗</span></div>
+          </div>
+          <div class="fine">© 2026 YTPocket. Not affiliated with YouTube or Google. Only download videos you have the right to.</div>
+        </div></footer>`;
+
+      document.getElementById('desktop').innerHTML = page(false);
+
+      // Each phone scrolls to a named section (data-at) of the same page.
+      const phones = [
+        ['1. Top of the page', null],
+        ['2. Contents list', 'toc'],
+        ['3. Guide for each device', 'device'],
+        ['4. Video quality table', 'quality'],
+        ['5. Links that work', 'links'],
+        ['6. Troubleshooting', 'fix'],
+        ['7. Safe and legal, FAQ', 'safe'],
+        ['8. Bottom: tools and footer', 'end'],
+      ];
+      const host = document.getElementById('phones');
+      for (const [cap, at] of phones) {
+        const fig = document.createElement('figure');
+        fig.innerHTML = `<figcaption>${cap}</figcaption><div class="phone"><div class="app m"><div class="scroll">${page(true)}</div></div></div>`;
+        host.append(fig);
+        const scroll = fig.querySelector('.scroll');
+        const max = scroll.scrollHeight - 764;
+        let y = 0;
+        if (at === 'end') y = max;
+        else if (at) {
+          const el = scroll.querySelector(`[data-at="${at}"]`);
+          y = el.getBoundingClientRect().top - scroll.getBoundingClientRect().top - 40;
+        }
+        scroll.style.transform = `translateY(-${Math.max(0, Math.min(y, max))}px)`;
+      }
+    </script>
+  </body>
+</html>

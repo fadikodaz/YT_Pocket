@@ -43,6 +43,14 @@ const BOLD = [
   'share-network',
   'hand-pointing',
   'dots-three',
+  // SEO content sections
+  'apple-logo',
+  'android-logo',
+  'windows-logo',
+  'laptop',
+  'arrow-up',
+  'lock-simple',
+  'prohibit',
 ];
 
 // Feature and illustration icons (duotone)

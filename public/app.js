@@ -9,6 +9,7 @@
 // Each page says which tab opens first (<body data-tab="video|audio|
 // thumbnail">); "thumbnail" pages only offer the thumbnail.
 import './nav.js';
+import './sections.js';
 
 const $ = (sel) => document.querySelector(sel);
 
