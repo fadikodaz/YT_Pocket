@@ -840,33 +840,6 @@ svg {
     grid-template-columns: 120px minmax(0, 1fr);
   }
 }
-/* Big tap target for phones: reads the clipboard in one tap. */
-.paste-zone {
-  min-height: 104px;
-  border: var(--line) dashed var(--outline);
-  border-radius: 18px;
-  background: var(--soft);
-  font-size: 1.15rem;
-  font-weight: 800;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 2px;
-  text-align: center;
-}
-.paste-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.paste-zone small {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--muted);
-}
-.paste-zone:hover {
-  border-style: solid;
-}
 .intake {
   display: flex;
   gap: 10px;
@@ -925,18 +898,22 @@ svg {
 .intake input:placeholder-shown {
   padding-right: 112px; /* room for the Paste button */
 }
-/* Phones: icon only (the big "Tap to paste link" area is right above). */
-@media (max-width: 759px) {
+/* Phones: link box full width (with its Paste button), the action button
+   full width under it. */
+@media (max-width: 559px) {
+  .intake {
+    flex-direction: column;
+  }
+  .intake input {
+    height: 58px;
+  }
   .field-paste {
-    width: 38px;
-    padding: 0;
-    justify-content: center;
+    top: 10px;
+    height: 38px;
   }
-  .field-paste-text {
-    display: none;
-  }
-  .intake input:placeholder-shown {
-    padding-right: 54px;
+  .cta {
+    width: 100%;
+    height: 54px;
   }
 }
 .clear {
@@ -1035,8 +1012,7 @@ svg {
 
 /* Once a video is loaded the page keeps its shape: the pasted video takes
    the example card's place, and the guides stay below. */
-.has-video .ex,
-.has-video .paste-zone {
+.has-video .ex {
   display: none;
 }
 @media (min-width: 900px) {
@@ -2998,12 +2974,6 @@ svg {
   .cta {
     padding: 0 12px;
     font-size: 1rem;
-  }
-}
-/* No paste zone on wide screens with a mouse; the field is enough there. */
-@media (min-width: 760px) and (hover: hover) and (pointer: fine) {
-  .paste-zone {
-    display: none;
   }
 }
 

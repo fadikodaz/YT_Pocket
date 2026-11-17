@@ -16,7 +16,6 @@ const $ = (sel) => document.querySelector(sel);
 const el = {
   body: document.body,
   url: $('#url'),
-  pasteZone: $('#pasteZone'),
   pasteBtn: $('#pasteBtn'),
   clearBtn: $('#clearBtn'),
   fetchBtn: $('#fetchBtn'),
@@ -1185,7 +1184,6 @@ async function pasteFromClipboard() {
     });
   }
 }
-el.pasteZone.addEventListener('click', pasteFromClipboard);
 el.pasteBtn.addEventListener('click', pasteFromClipboard);
 
 el.clearBtn.addEventListener('click', () => {
