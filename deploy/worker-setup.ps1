@@ -3,7 +3,7 @@
 # through this PC's home connection (see YTDLP_PROXY_YOUTUBE in .env.example).
 #
 # Run in PowerShell as Administrator:
-#   irm https://raw.githubusercontent.com/fadikodaz/youtube_api/main/deploy/worker-setup.ps1 | iex
+#   irm https://raw.githubusercontent.com/fadikodaz/YT_Pocket/main/deploy/worker-setup.ps1 | iex
 # Server address other than the default: set $ServerIp first, e.g.
 #   $ServerIp = '100.x.y.z'; irm <url> | iex
 $ErrorActionPreference = 'Stop'
