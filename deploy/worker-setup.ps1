@@ -22,8 +22,12 @@ if (Get-Service 3proxy -ErrorAction SilentlyContinue) {
 }
 
 New-Item -ItemType Directory -Force $dir | Out-Null
-$zip = Join-Path $env:TEMP '3proxy.zip'
-$tmp = Join-Path $env:TEMP '3proxy-x'
+# Windows Defender flags every proxy tool (3proxy included) as "potentially
+# unwanted" because attackers misuse them. Let it skip only this folder.
+Add-MpPreference -ExclusionPath $dir
+Start-Sleep 2
+$zip = Join-Path $dir '3proxy.zip'
+$tmp = Join-Path $dir 'download'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Invoke-WebRequest $url -OutFile $zip -UseBasicParsing
 if ((Get-FileHash $zip -Algorithm SHA256).Hash -ne $sha) { throw 'Download check failed (wrong file).' }
@@ -58,6 +62,7 @@ Pop-Location
 Start-Sleep 3
 if ((Get-Service 3proxy).Status -ne 'Running') { Start-Service 3proxy }
 Set-Service 3proxy -StartupType Automatic
+Remove-Item $zip, $tmp -Recurse -Force -ErrorAction SilentlyContinue
 
 Get-Service 3proxy | Format-Table Name, Status, StartType
 Write-Host 'Done. The proxy starts by itself whenever this PC turns on.' -ForegroundColor Green
