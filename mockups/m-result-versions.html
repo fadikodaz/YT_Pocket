@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Option M: three result card versions</title>
+    <link rel="stylesheet" href="mockups.css" />
+    <script src="icons-sprite.js"></script>
+    <style>
+      @font-face {
+        font-family: 'Bricolage Grotesque';
+        src: url('../public/fonts/bricolage-latin.woff2') format('woff2');
+        font-weight: 200 800;
+      }
+      .ver { max-width: 1900px; margin: 30px auto 0; padding: 0 24px; }
+      .ver h2 { margin: 0; font-size: 24px; }
+      .ver p.d { margin: 4px 0 0; max-width: 1000px; color: #3d434b; }
+      .row { display: flex; gap: 34px; flex-wrap: wrap; align-items: flex-start; padding: 30px 24px 20px; margin: 12px 0 0;
+        background: #ffd43b; border-radius: 18px; }
+      .cap { font: 700 14px system-ui; color: #161616; margin: 0 0 22px; }
+      .app { --bg: #ffd43b; --card: #fffdf5; --soft: #fff4c2; --ink: #161616; --muted: #55524a; --pop: #ff5d8f; --pop-soft: #ffc2d5; --mint: #3ddc97;
+        font-family: 'Bricolage Grotesque', system-ui, sans-serif; color: var(--ink); font-weight: 500; }
+      .app * { box-sizing: border-box; }
+      .ic { width: 16px; height: 16px; fill: currentColor; flex: none; }
+      .box { background: var(--card); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+
+      /* shared card bits (match the example card) */
+      .card { position: relative; width: 440px; border-radius: 22px; padding: 12px; }
+      .card.tilt { transform: rotate(1.2deg); }
+      .tag { position: absolute; top: -15px; left: 16px; transform: rotate(-3deg); border: 3px solid var(--ink); border-radius: 12px; padding: 1px 10px; font-weight: 800; font-size: 13px; z-index: 3; }
+      .tag.ex { background: var(--pop); }
+      .tag.you { background: var(--mint); }
+      .media { position: relative; border: 3px solid var(--ink); border-radius: 14px; overflow: hidden; background: #000; }
+      .media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+      .wide { aspect-ratio: 16 / 9; }
+      .tall { aspect-ratio: 9 / 16; }
+      .square { aspect-ratio: 1; }
+      .chip { position: absolute; right: 8px; bottom: 8px; background: rgb(22 22 22 / 0.85); color: #fff; font-size: 12px; font-weight: 800; border-radius: 7px; padding: 1px 7px; }
+      .mark { position: absolute; right: 8px; top: 8px; width: 30px; height: 30px; border: 2px solid #161616; border-radius: 9px; background: #ff0000; color: #fff; display: grid; place-items: center; }
+      .title { margin: 10px 2px 0; font-weight: 800; font-size: 17px; line-height: 1.2; }
+      .by { margin: 2px 2px 8px; font-size: 13px; color: var(--muted); }
+      .bar { display: flex; align-items: center; gap: 8px; margin: 0 2px 8px; font-size: 13px; font-weight: 800; }
+      .bar .lnk { display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-underline-offset: 3px; }
+      .bar .clear { margin-left: auto; color: var(--muted); text-decoration: underline; }
+      .seg { display: inline-flex; border: 2px solid var(--ink); border-radius: 99px; overflow: hidden; }
+      .seg span { padding: 3px 11px; font-weight: 800; font-size: 13px; display: flex; gap: 5px; align-items: center; }
+      .seg .on { background: var(--pop); }
+      .seg span + span { border-left: 2px solid var(--ink); }
+      .rows { display: grid; gap: 6px; }
+      .r { position: relative; overflow: hidden; display: flex; align-items: center; gap: 8px; border: 3px solid var(--ink); border-radius: 12px; background: #fff; padding: 5px 6px 5px 11px; font-size: 14.5px; }
+      .r b { flex: 1; position: relative; }
+      .r small { position: relative; font-weight: 700; color: var(--muted); font-size: 13px; }
+      .r .tagv { font-style: normal; font-size: 10.5px; font-weight: 800; border: 1.5px solid var(--ink); border-radius: 99px; padding: 0 6px; margin-left: 6px; background: var(--soft); vertical-align: 2px; }
+      .dl { position: relative; width: 28px; height: 28px; flex: none; border: 2px solid var(--ink); border-radius: 50%; background: var(--mint); display: grid; place-items: center; font-size: 9px; font-weight: 800; }
+      .dl .ic { width: 14px; height: 14px; }
+      .r.best { background: #eafbf3; }
+      .r.busy::before { content: ''; position: absolute; inset: 0 42% 0 0; background: repeating-linear-gradient(45deg, var(--pop-soft) 0 7px, #ffdfe9 7px 14px); }
+      .r.busy .dl { background: #fff; }
+      .r.done .dl { background: var(--ink); color: var(--mint); }
+      .try { margin-top: 9px; display: flex; justify-content: center; gap: 6px; align-items: center; font-size: 14px; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+      .foot { margin-top: 8px; display: flex; justify-content: center; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+      .side { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; align-items: start; }
+      .side .title { margin-top: 2px; }
+      .side .bar { flex-wrap: wrap; row-gap: 6px; }
+      .side .bar .seg { flex-basis: 100%; width: fit-content; }
+      .head { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; align-items: center; margin-bottom: 10px; }
+      .head .title { margin-top: 0; }
+
+      /* A: scroll box with a styled scrollbar */
+      .scroll { max-height: 170px; overflow-y: auto; padding-right: 6px; margin-right: -4px; scrollbar-width: thin; scrollbar-color: var(--ink) var(--soft); }
+      .scroll::-webkit-scrollbar { width: 8px; }
+      .scroll::-webkit-scrollbar-track { background: var(--soft); border-radius: 99px; }
+      .scroll::-webkit-scrollbar-thumb { background: var(--ink); border-radius: 99px; }
+      .scroll-wrap { position: relative; }
+      .scroll-wrap::after { content: ''; position: absolute; left: 0; right: 10px; bottom: 0; height: 26px; pointer-events: none; background: linear-gradient(transparent, var(--card)); }
+      .side .scroll { max-height: 172px; }
+
+      /* B: chip picker + one button */
+      .chips { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 8px; scrollbar-width: thin; scrollbar-color: var(--ink) var(--soft); }
+      .chips::-webkit-scrollbar { height: 6px; }
+      .chips::-webkit-scrollbar-thumb { background: var(--ink); border-radius: 99px; }
+      .chips::-webkit-scrollbar-track { background: var(--soft); border-radius: 99px; }
+      .chips span { flex: none; display: grid; text-align: center; padding: 5px 11px; border: 2.5px solid var(--ink); border-radius: 12px; background: #fff; font-weight: 800; font-size: 14px; line-height: 1.1; }
+      .chips span small { font-weight: 600; font-size: 11.5px; color: var(--muted); }
+      .chips .on { background: var(--pop); }
+      .chips .on small { color: #161616; }
+      .chips .bestc { box-shadow: inset 0 -4px 0 var(--mint); }
+      .big { position: relative; overflow: hidden; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; height: 50px; border: 3px solid var(--ink); border-radius: 14px; background: var(--mint); font-weight: 800; font-size: 16px; box-shadow: 3px 3px 0 var(--ink); }
+      .big.busy { background: #fff; }
+      .big.busy::before { content: ''; position: absolute; inset: 0 38% 0 0; background: repeating-linear-gradient(45deg, var(--pop-soft) 0 8px, #ffdfe9 8px 16px); }
+      .big span { position: relative; display: flex; align-items: center; gap: 8px; }
+      .big .ic { width: 20px; height: 20px; }
+
+      /* C: best first + menu over the card */
+      .bestrow { position: relative; overflow: hidden; display: flex; align-items: center; gap: 10px; border: 3px solid var(--ink); border-radius: 14px; background: #eafbf3; padding: 8px 8px 8px 12px; box-shadow: 3px 3px 0 var(--ink); }
+      .bestrow div { flex: 1; position: relative; }
+      .bestrow b { display: block; font-size: 16px; }
+      .bestrow small { font-size: 12.5px; color: var(--muted); font-weight: 700; }
+      .bestrow .dl { width: 40px; height: 40px; border-width: 3px; }
+      .bestrow .dl .ic { width: 18px; height: 18px; }
+      .bestrow.busy { background: #fff; }
+      .bestrow.busy::before { content: ''; position: absolute; inset: 0 38% 0 0; background: repeating-linear-gradient(45deg, var(--pop-soft) 0 8px, #ffdfe9 8px 16px); }
+      .more { margin-top: 8px; display: flex; gap: 8px; }
+      .more span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border: 2.5px solid var(--ink); border-radius: 12px; padding: 7px; font-weight: 800; font-size: 13.5px; background: #fff; }
+      .more span.open { background: var(--soft); }
+      .menu { position: absolute; left: 12px; right: 12px; bottom: 54px; z-index: 4; padding: 6px; border: 3px solid var(--ink); border-radius: 14px; background: var(--card); box-shadow: 5px 5px 0 var(--ink); max-height: 220px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--ink) var(--soft); }
+      .menu::-webkit-scrollbar { width: 8px; }
+      .menu::-webkit-scrollbar-thumb { background: var(--ink); border-radius: 99px; }
+      .menu::-webkit-scrollbar-track { background: var(--soft); border-radius: 99px; }
+      .menu .mi { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 10px; font-size: 14.5px; }
+      .menu .mi:nth-child(2) { background: var(--soft); }
+      .menu .mi b { flex: 1; }
+      .menu .mi small { color: var(--muted); font-weight: 700; font-size: 12.5px; }
+      .menu h4 { margin: 4px 8px 4px; font-size: 12px; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <header class="mock-head">
+      <h1>Option M: three versions of the "Your video" card</h1>
+      <p>
+        All three keep the card the <b>same size as the example card</b> and never push the page down. First row: the
+        example card you have now, for comparison. Each version shows a long video (8 qualities), a Short, the MP3 page
+        and a download in progress. <a href="index.html">Back to all options</a>
+      </p>
+    </header>
+
+    <section class="ver"><h2>Now: the example card (empty state)</h2>
+      <div class="row app" id="now"></div></section>
+
+    <section class="ver"><h2>Version A: exactly like the example card, list scrolls inside</h2>
+      <p class="d">Same picture, title and row style as the example. All qualities are in the card; the list is about 4 rows tall and scrolls inside with a styled scrollbar (a fade at the bottom shows there's more). Video/MP3 is a small switch next to Save thumbnail.</p>
+      <div class="row app" id="a"></div></section>
+
+    <section class="ver"><h2>Version B: pick a quality, one big Download button</h2>
+      <p class="d">Qualities are chips you swipe sideways (the best pick is pre-selected and underlined green). One big green button says exactly what you'll get, and becomes the progress bar. Smallest and calmest card.</p>
+      <div class="row app" id="b"></div></section>
+
+    <section class="ver"><h2>Version C: the best pick first, other qualities in a menu</h2>
+      <p class="d">Most people want the recommended quality, so it gets one big row. "Other qualities" and "MP3 instead" open a menu that floats over the card (scrolls inside), so the page never moves.</p>
+      <div class="row app" id="c"></div></section>
+
+    <script>
+      document.body.insertAdjacentHTML('afterbegin', window.ICON_SPRITE);
+      const ic = (id) => `<svg class="ic"><use href="#${id}"/></svg>`;
+      const fig = (host, cap, html) => document.getElementById(host).insertAdjacentHTML('beforeend', `<div><p class="cap">${cap}</p>${html}</div>`);
+      const dl = (st) => `<span class="dl">${st === 'busy' ? '58%' : st === 'done' ? ic('i-check') : ic('i-download-simple')}</span>`;
+      const row = ([name, size, st, note]) => `<div class="r${st ? ' ' + st : ''}"><b>${name}${note ? `<i class="tagv">${note}</i>` : ''}</b><small>${st === 'busy' ? 'Saving 58%' : st === 'done' ? 'Saved' : size}</small>${dl(st)}</div>`;
+
+      const BUNNY = { img: 'bunny-wide.jpg', dur: '10:35', title: 'Big Buck Bunny 60fps 4K - Official Blender Foundation Short Film', by: 'Blender, 10:35' };
+      const SHORT = { img: 'spring-tall.jpg', dur: '1:00', title: 'GTA 6 Downloaded 🔥', by: 'Muneeb Bhai Gaming, 1:00' };
+      const SINTEL = { img: 'sintel-square.jpg', title: 'Sintel - Open Movie by Blender Foundation', by: 'Blender, 14:48' };
+      const V8 = [['4K 60fps', '1.3 GB', '', 'VLC'], ['2K 60fps', '461 MB', '', 'VLC'], ['1080p 60fps', '255 MB', 'best'], ['720p 60fps', '153 MB'], ['480p', '37 MB'], ['360p', '27 MB'], ['240p', '19 MB'], ['144p', '14 MB']];
+      const S7 = [['1080p 60fps', '41 MB', 'best'], ['720p 60fps', '25 MB'], ['608p', '7.0 MB'], ['480p', '5.6 MB'], ['360p', '4.0 MB'], ['240p', '2.3 MB'], ['144p', '1.5 MB']];
+      const A3 = [['MP3 192 kbps', '20 MB', 'best'], ['MP3 128 kbps', '14 MB'], ['M4A original', '14 MB']];
+      const busy = (list) => list.map((r, i) => (i === 2 ? [r[0], r[1], 'busy'] : i === 3 ? [r[0], r[1], 'done'] : [r[0], r[1], r[2] === 'best' ? '' : r[2], r[3]]));
+      const seg = (mp3) => `<span class="seg"><span${mp3 ? '' : ' class="on"'}>${ic('i-video-camera')}MP4</span><span${mp3 ? ' class="on"' : ''}>${ic('i-music-notes')}MP3</span></span>`;
+      const bar = (save = 'Thumbnail', mp3 = false, segOn = true) => `<div class="bar">${segOn ? seg(mp3) : ''}<span class="lnk">${ic('i-image')}${save}</span><span class="clear">Clear</span></div>`;
+      const wideTop = (v) => `<div class="media wide"><img src="img/${v.img}" alt=""><span class="chip">${v.dur}</span><span class="mark">${ic('b-youtube')}</span></div><p class="title">${v.title}</p><p class="by">${v.by}</p>`;
+
+      // ---------- now ----------
+      fig('now', 'Example (empty state)', `<aside class="card box tilt"><span class="tag ex">Example</span>${wideTop({ ...BUNNY, title: 'Big Buck Bunny 60fps 4K', by: 'Blender Foundation, free to share (CC BY)' })}
+        <div class="rows">${row(['4K 60fps MP4', '≈ 1.3 GB'])}${row(['1080p 60fps MP4', '≈ 255 MB'])}${row(['MP3 192 kbps', '≈ 15 MB'])}</div><div class="try">${ic('i-arrow-up')}Try this example</div></aside>`);
+      fig('now', 'Thumbnail page example', `<aside class="card box tilt"><span class="tag ex">Example</span><div class="media wide"><img src="img/bunny-wide.jpg" alt=""></div>
+        <div class="bar" style="margin-top:10px"><span style="flex:1;font-size:17px">Big Buck Bunny 60fps 4K</span><span class="seg"><span>1280 × 720, JPG</span></span></div><div class="try">${ic('i-arrow-up')}Try this example</div></aside>`);
+
+      // ---------- A ----------
+      const scroll = (rows) => `<div class="scroll-wrap"><div class="scroll rows">${rows.map(row).join('')}</div></div>`;
+      fig('a', 'Video, 8 qualities (scrolls inside)', `<aside class="card box"><span class="tag you">Your video</span>${wideTop(BUNNY)}${bar()}${scroll(V8)}<p class="foot">8 qualities · scroll for more</p></aside>`);
+      fig('a', 'Shorts', `<aside class="card box"><span class="tag you">Your video</span><div class="side"><div class="media tall"><img src="img/${SHORT.img}" alt=""><span class="chip">1:00</span></div>
+        <div><p class="title">${SHORT.title}</p><p class="by">${SHORT.by}</p>${bar('Cover')}${scroll(S7)}</div></div></aside>`);
+      fig('a', 'MP3 page', `<aside class="card box"><span class="tag you">Your video</span><div class="head"><div class="media square"><img src="img/${SINTEL.img}" alt=""></div>
+        <div><p class="title">${SINTEL.title}</p><p class="by">${SINTEL.by}</p>${bar('Cover', true, false)}</div></div><div class="rows">${A3.map(row).join('')}</div><div class="try">Want the video? Use the Video downloader</div></aside>`);
+      fig('a', 'Downloading', `<aside class="card box"><span class="tag you">Your video</span>${wideTop(BUNNY)}${bar()}${scroll(busy(V8).slice(1))}<p class="foot">8 qualities · scroll for more</p></aside>`);
+
+      // ---------- B ----------
+      const chips = (list, sel) => `<div class="chips">${list.map((r, i) => `<span class="${i === sel ? 'on' : ''}${r[2] === 'best' ? ' bestc' : ''}">${r[0].replace(' 60fps', ' 60')}<small>${r[1]}</small></span>`).join('')}</div>`;
+      const big = (label, b) => `<div class="big${b ? ' busy' : ''}"><span>${b ? `Saving 1080p… 58%` : `${ic('i-download-simple')}${label}`}</span></div>`;
+      fig('b', 'Video, 8 qualities (swipe chips)', `<aside class="card box"><span class="tag you">Your video</span>${wideTop(BUNNY)}${bar()}${chips(V8, 2)}${big('Download 1080p 60fps · 255 MB')}</aside>`);
+      fig('b', 'Shorts', `<aside class="card box"><span class="tag you">Your video</span><div class="side"><div class="media tall"><img src="img/${SHORT.img}" alt=""><span class="chip">1:00</span></div>
+        <div><p class="title">${SHORT.title}</p><p class="by">${SHORT.by}</p>${bar('Cover')}${chips(S7, 0)}${big('Download · 41 MB')}</div></div></aside>`);
+      fig('b', 'MP3 page', `<aside class="card box"><span class="tag you">Your video</span><div class="head"><div class="media square"><img src="img/${SINTEL.img}" alt=""></div>
+        <div><p class="title">${SINTEL.title}</p><p class="by">${SINTEL.by}</p>${bar('Cover', true, false)}</div></div>${chips(A3, 0)}${big('Download MP3 192 kbps · 20 MB')}<div class="try">Want the video? Use the Video downloader</div></aside>`);
+      fig('b', 'Downloading', `<aside class="card box"><span class="tag you">Your video</span>${wideTop(BUNNY)}${bar()}${chips(V8, 2)}${big('', true)}</aside>`);
+
+      // ---------- C ----------
+      const bestRow = (name, sub, b) => `<div class="bestrow${b ? ' busy' : ''}"><div><b>${name}</b><small>${b ? 'Saving 58%, about 20 s left' : sub}</small></div><span class="dl">${b ? '58%' : ic('i-download-simple')}</span></div>`;
+      const more = (open, a = 'Other qualities', b2 = 'MP3 instead') => `<div class="more"><span class="${open ? 'open' : ''}">${ic('i-caret-down')}${a}</span><span>${ic(/Video/.test(b2) ? 'i-video-camera' : 'i-music-notes')}${b2}</span></div>`;
+      const menu = `<div class="menu"><h4>Video MP4</h4>${V8.filter((r) => r[2] !== 'best').map((r) => `<div class="mi"><b>${r[0]}</b><small>${r[1]}${r[3] ? ' · VLC' : ''}</small>${dl()}</div>`).join('')}</div>`;
+      fig('c', 'Video', `<aside class="card box"><span class="tag you">Your video</span>${wideTop(BUNNY)}<div class="bar"><span class="lnk">${ic('i-image')}Save thumbnail</span><span class="clear">Clear</span></div>${bestRow('1080p 60fps HD · Best pick', 'MP4, about 255 MB, plays everywhere')}${more(false)}</aside>`);
+      fig('c', '"Other qualities" open (floats over the card)', `<aside class="card box"><span class="tag you">Your video</span>${wideTop(BUNNY)}<div class="bar"><span class="lnk">${ic('i-image')}Save thumbnail</span><span class="clear">Clear</span></div>${bestRow('1080p 60fps HD · Best pick', 'MP4, about 255 MB, plays everywhere')}${more(true)}${menu}</aside>`);
+      fig('c', 'Shorts', `<aside class="card box"><span class="tag you">Your video</span><div class="side"><div class="media tall"><img src="img/${SHORT.img}" alt=""><span class="chip">1:00</span></div>
+        <div><p class="title">${SHORT.title}</p><p class="by">${SHORT.by}</p><div class="bar"><span class="lnk">${ic('i-image')}Cover</span><span class="clear">Clear</span></div>${bestRow('1080p 60fps', 'About 41 MB')}${more(false, 'Other sizes', 'MP3')}</div></div></aside>`);
+      fig('c', 'MP3 page, downloading', `<aside class="card box"><span class="tag you">Your video</span><div class="head"><div class="media square"><img src="img/${SINTEL.img}" alt=""></div>
+        <div><p class="title">${SINTEL.title}</p><p class="by">${SINTEL.by}</p><div class="bar"><span class="lnk">${ic('i-image')}Cover</span><span class="clear">Clear</span></div></div></div>${bestRow('MP3 192 kbps', '', true)}${more(false, '128 kbps or M4A', 'Video instead')}</aside>`);
+    </script>
+  </body>

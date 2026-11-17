@@ -45,6 +45,8 @@ const el = {
   tabAudio: $('#tabAudio'),
   sheetNote: $('#sheetNote'),
   options: $('#options'),
+  optionsMore: $('#optionsMore'),
+  tabs: $('#tabs'),
   health: $('#health'),
   toasts: $('#toasts'),
   announcer: $('#announcer'),
@@ -75,9 +77,8 @@ const state = {
   infoCache: new Map(), // url -> { info, at }
   jobs: new Map(), // `${info.key}|${value}[@start-end]` -> job
   rows: new Map(), // key -> row parts, for the visible tab only
-  showAll: false, // long quality list opened with "Show all"
 };
-const SHOW_FIRST = 4; // qualities shown before "Show all"
+const SHOW_FIRST = 4; // rows visible before the list scrolls inside the card
 
 // ------------------------------------------------------------------ utils --
 
@@ -177,7 +178,6 @@ const ICON = {
   check: 'i-check',
   retry: 'i-arrow-clockwise',
   close: 'i-x',
-  caret: 'i-caret-down',
 };
 
 const show = (n) => (n.hidden = false);
@@ -293,6 +293,7 @@ function updateControls() {
 
 async function fetchInfo(input, { force = false, silent = false } = {}) {
   const parsed = parseInput(input);
+  if (!silent) state.rawInput = String(input || '');
   if (!parsed) {
     if (!silent) {
       abortFetch();
@@ -382,8 +383,28 @@ function switchToMatchingPage(info, url) {
   return true;
 }
 
+// Shorts page: a /shorts/ link always counts; a watch?v= link counts when
+// the video itself is a Short (vertical, 3 minutes or less). Regular videos
+// open in the video downloader instead.
+const SHORTS_ONLY = document.body.dataset.shorts === '1';
+const SHORTS_MAX_SEC = 180;
+
+function isShort(info) {
+  if (/\/shorts\//i.test(state.rawInput || '')) return true;
+  const v = (info.videoOptions || []).find((o) => o.width && o.height);
+  if (!v) return true; // can't tell: don't turn it away
+  return v.width < v.height && (Number(info.lengthSeconds) || 0) <= SHORTS_MAX_SEC;
+}
+
+function sendRegularVideoHome(info, url) {
+  if (!SHORTS_ONLY || info.site !== 'YouTube' || isShort(info)) return false;
+  location.assign(`/?url=${encodeURIComponent(url)}&notshort=1`);
+  return true;
+}
+
 function showInfo(info, url) {
   if (switchToMatchingPage(info, url)) return;
+  if (sendRegularVideoHome(info, url)) return;
   const key = info.key || info.videoId;
   const same = state.info && (state.info.key || state.info.videoId) === key;
   state.info = info;
@@ -404,9 +425,14 @@ function showInfo(info, url) {
     el.thumb.onerror = null;
     // Vertical videos (TikTok, Shorts, Reels) get a tall picture frame.
     const v = (info.videoOptions || []).find((o) => o.width && o.height);
-    el.screen.classList.toggle('portrait', !!v && v.width < v.height);
+    const portrait = !!v && v.width < v.height;
+    el.result.classList.toggle('is-tall', portrait && !THUMBNAIL_ONLY);
+    el.result.classList.toggle('is-music', !portrait && ONLY === 'audio');
     el.thumb.onload = () => {
-      if (!v && el.thumb.naturalHeight > el.thumb.naturalWidth * 1.05) el.screen.classList.add('portrait');
+      if (!v && !THUMBNAIL_ONLY && el.thumb.naturalHeight > el.thumb.naturalWidth * 1.05) {
+        el.result.classList.add('is-tall');
+        el.result.classList.remove('is-music');
+      }
     };
     // No picture (some sites don't provide one): show the site name instead.
     const noPicture = !youtube && !info.thumbnail;
@@ -439,7 +465,6 @@ function showInfo(info, url) {
     }
     // Default tab: video, unless there are no video formats (e.g. SoundCloud).
     state.kind = (info.videoOptions || []).length ? state.kind : 'audio';
-    state.showAll = false;
     resetCut();
   }
 
@@ -448,6 +473,7 @@ function showInfo(info, url) {
   show(el.videoBody);
   // Thumbnail pages: the big "Save thumbnail" button is the only action.
   el.sheet.hidden = THUMBNAIL_ONLY;
+  el.tabs.hidden = THUMBNAIL_ONLY;
   el.thumbDl.classList.toggle('big', THUMBNAIL_ONLY);
   if (!THUMBNAIL_ONLY) renderOptions();
   updateControls();
@@ -533,18 +559,17 @@ function audioOptions(info) {
   const est = info.estimatedSizes || {};
   const opts = [];
   if ((Number(info.maxAudioBitrate) || 0) >= 250) {
-    opts.push({ value: 'mp3:320', name: 'MP3 320 kbps', note: 'Best quality', bytes: est[320] });
+    opts.push({ value: 'mp3:320', name: 'MP3 320 kbps', bytes: est[320] });
   }
   opts.push(
-    { value: 'mp3:192', name: 'MP3 192 kbps', note: 'High quality', bytes: est[192] },
-    { value: 'mp3:128', name: 'MP3 128 kbps', note: 'Smaller file', bytes: est[128] }
+    { value: 'mp3:192', name: 'MP3 192 kbps', bytes: est[192], best: true },
+    { value: 'mp3:128', name: 'MP3 128 kbps', bytes: est[128] }
   );
   // "Original" needs a separate audio track, which many non-YouTube sites lack.
   if (info.sourceExt) {
     opts.push({
       value: 'original',
       name: `${info.sourceExt.toUpperCase()} original`,
-      note: 'Not re-encoded',
       bytes: info.sourceSize,
     });
   }
@@ -560,15 +585,24 @@ function videoName(o) {
 }
 
 function videoOptions(info) {
-  return (info.videoOptions || [])
+  const list = (info.videoOptions || [])
     .slice()
     .sort((a, b) => b.height - a.height)
-    .map((o) => ({
-      value: `video:${o.height}`,
-      name: videoName(o),
-      note: !o.codec || o.codec === 'H.264' ? '' : 'Plays in browsers and VLC',
-      bytes: o.estimatedSize,
-    }));
+    .map((o) => {
+      const vlc = !!o.codec && o.codec !== 'H.264';
+      return {
+        value: `video:${o.height}`,
+        name: videoName(o),
+        tag: vlc ? 'VLC' : '',
+        note: vlc ? 'Plays in browsers and VLC' : '',
+        bytes: o.estimatedSize,
+        p: o.width && o.width < o.height ? o.width : o.height,
+      };
+    });
+  // Best pick: the sharpest quality that plays everywhere (H.264, up to 1080p).
+  const best = list.find((o) => !o.tag && o.p <= 1080) || list[0];
+  if (best && list.length > 1) best.best = true;
+  return list;
 }
 
 function blockedReason(info, opt) {
@@ -589,7 +623,7 @@ function renderOptions() {
   // otherwise fall back to showing both tabs.
   const only = ONLY === 'video' ? hasVideo && ONLY : ONLY === 'audio' ? !el.tabAudio.disabled && ONLY : '';
   if (only) state.kind = only;
-  el.tabVideo.parentElement.hidden = !!only;
+  el.tabs.hidden = !!only || THUMBNAIL_ONLY;
   if (sheetSwitch) {
     sheetSwitch.hidden = !only || !sheetSwitch.dataset.path;
     sheetSwitch.href = `${sheetSwitch.dataset.path}?url=${encodeURIComponent(state.url)}`;
@@ -609,28 +643,13 @@ function renderOptions() {
   const focusedKey = document.activeElement?.closest?.('.opt')?.dataset.key;
   state.rows.clear();
   const opts = state.kind === 'video' ? videoOptions(info) : audioOptions(info);
-  const items = opts.map((opt) => h('li', {}, makeRow(info, opt)));
-  // Long lists: the top few, plus any row with a download, then "Show all".
-  let hidden = 0;
-  if (!state.showAll && items.length > SHOW_FIRST + 1) {
-    items.forEach((li, i) => {
-      if (i >= SHOW_FIRST && !state.jobs.has(li.firstChild.dataset.key)) {
-        li.hidden = true;
-        hidden += 1;
-      }
-    });
-  }
-  el.options.replaceChildren(...items);
-  if (hidden) {
-    const more = h('button', { type: 'button', class: 'show-all', text: `Show all ${items.length} qualities` });
-    more.prepend(svgIcon(ICON.caret));
-    more.addEventListener('click', () => {
-      state.showAll = true;
-      renderOptions();
-      el.options.children[SHOW_FIRST]?.querySelector('.opt')?.focus();
-    });
-    el.options.append(h('li', { class: 'show-all-row' }, more));
-  }
+  el.options.replaceChildren(...opts.map((opt) => h('li', {}, makeRow(info, opt))));
+  // More than a few: the list scrolls inside the card, so the page never grows.
+  const scrolls = opts.length > SHOW_FIRST;
+  el.options.classList.toggle('scrolls', scrolls);
+  el.optionsMore.hidden = !scrolls;
+  el.optionsMore.textContent = `${opts.length} ${state.kind === 'video' ? 'qualities' : 'formats'}, scroll for more`;
+  el.options.scrollTop = 0;
   for (const key of state.rows.keys()) paintRow(key);
   if (focusedKey) state.rows.get(focusedKey)?.btn.focus();
 }
@@ -645,14 +664,15 @@ function makeRow(info, opt) {
   const share = cut && info.lengthSeconds ? Math.min(1, (cut.end - cut.start) / info.lengthSeconds) : 1;
   const bytes = opt.bytes ? opt.bytes * share : 0;
   const part = cut ? `Part ${fmtDuration(cut.start)} to ${fmtDuration(cut.end)}` : '';
-  const size = bytes ? `${part ? 'about' : 'About'} ${fmtBytes(bytes)}` : '';
-  const idleSub = [part, size, cut ? '' : opt.note].filter(Boolean).join(', ');
+  const size = bytes ? `≈ ${fmtBytes(bytes)}` : '';
+  const idleSub = [part, size].filter(Boolean).join(', ');
   const name = h('span', { class: 'opt-name', text: opt.name });
+  if (opt.tag) name.append(h('i', { class: 'opt-tag', text: opt.tag, title: opt.note || '' }));
   const sub = h('span', { class: 'opt-sub', text: reason || idleSub });
   const icon = h('span', { class: 'opt-icon', 'aria-hidden': 'true' });
   const btn = h(
     'button',
-    { type: 'button', class: 'opt', 'data-key': key },
+    { type: 'button', class: `opt${opt.best ? ' best' : ''}`, 'data-key': key },
     h('span', { class: 'opt-text' }, name, sub),
     icon
   );
@@ -664,7 +684,7 @@ function makeRow(info, opt) {
   const label = cut ? `${opt.name} (part)` : opt.name;
   const meta = { key, url: state.url, value: opt.value, label, title: info.title, cut };
   btn.addEventListener('click', () => onRowClick(key, meta));
-  state.rows.set(key, { btn, sub, icon, idleSub, label });
+  state.rows.set(key, { btn, sub, icon, idleSub, label, base: opt.best ? 'opt best' : 'opt' });
   return btn;
 }
 
@@ -745,7 +765,6 @@ el.cutClear.addEventListener('click', () => {
 function setKind(kind) {
   if (state.kind === kind || !state.info) return;
   state.kind = kind;
-  state.showAll = false;
   renderOptions();
 }
 el.tabVideo.addEventListener('click', () => setKind('video'));
@@ -811,7 +830,7 @@ function paintRow(key) {
   if (!row) return;
   const job = state.jobs.get(key);
   const d = describe(job);
-  row.btn.className = `opt${d ? ` ${d.cls}` : ''}`;
+  row.btn.className = `${row.base}${d ? ` ${d.cls}` : ''}`;
   row.btn.style.setProperty('--p', d?.pct ?? 0);
   row.sub.textContent = d ? d.sub : row.idleSub;
   if (d?.icon) row.icon.replaceChildren(d.icon);
@@ -1214,6 +1233,9 @@ function launchLink() {
   const from = q.get('from');
   if (link && from && from !== PAGE_PLATFORM) {
     toast(`This is a ${PAGE_PLATFORM} link, so it opened in the ${PAGE_PLATFORM} downloader.`, { type: 'info' });
+  }
+  if (link && q.get('notshort')) {
+    toast('This is a regular video, not a Short, so it opened in the video downloader.', { type: 'info' });
   }
   return link;
 }

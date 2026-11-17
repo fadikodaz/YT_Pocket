@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Option L: compact result card</title>
+    <link rel="stylesheet" href="mockups.css" />
+    <script src="icons-sprite.js"></script>
+    <style>
+      @font-face {
+        font-family: 'Bricolage Grotesque';
+        src: url('../public/fonts/bricolage-latin.woff2') format('woff2');
+        font-weight: 200 800;
+      }
+      .group-title { max-width: 1720px; margin: 26px auto 0; padding: 0 24px; font-size: 22px; }
+      .group-title small { display: block; font-size: 15px; font-weight: 500; color: #3d434b; }
+      .stack { max-width: 1720px; margin: 0 auto; padding: 12px 24px 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(820px, 1fr)); gap: 22px; }
+      .desk { width: fit-content; border-radius: 14px; overflow: hidden; border: 6px solid #111; box-shadow: 0 10px 30px rgb(0 0 0 / 0.18); background: #ffd43b; }
+      .desk > .app { width: 1280px; zoom: 0.64; }
+      .app { --bg: #ffd43b; --card: #fffdf5; --soft: #fff4c2; --ink: #161616; --muted: #55524a; --pop: #ff5d8f; --pop-soft: #ffc2d5; --mint: #3ddc97;
+        font-family: 'Bricolage Grotesque', system-ui, sans-serif; background: var(--bg); color: var(--ink); font-weight: 500; position: relative; }
+      .app * { box-sizing: border-box; }
+      .ic { width: 18px; height: 18px; fill: currentColor; flex: none; }
+      .box { background: var(--card); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+      .hdr { display: flex; align-items: center; gap: 16px; padding: 14px 30px 0; }
+      .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 21px; }
+      .logo { width: 32px; height: 32px; border: 3px solid var(--ink); border-radius: 10px; background: var(--pop); display: grid; place-items: center; }
+      .menu { display: flex; gap: 2px; font-weight: 800; font-size: 14.5px; }
+      .menu span { padding: 6px 10px; border-radius: 11px; }
+      .menu .cur { background: var(--card); box-shadow: inset 0 0 0 3px var(--ink); }
+      .hdr-end { margin-left: auto; display: flex; gap: 8px; }
+      .ibtn { width: 40px; height: 40px; border: 3px solid var(--ink); border-radius: 12px; background: var(--card); display: grid; place-items: center; box-shadow: 3px 3px 0 var(--ink); }
+      .hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 30px; align-items: center; padding: 26px 30px 26px; }
+      h1 { margin: 0 0 8px; font-size: 54px; line-height: 0.98; letter-spacing: -0.03em; font-weight: 800; }
+      .lead { margin: 0 0 16px; font-size: 17px; color: #3b382f; }
+      .tool { border-radius: 22px; padding: 16px; }
+      .intake { display: flex; gap: 10px; }
+      .field { flex: 1; height: 54px; border: 3px solid var(--ink); border-radius: 16px; background: #fff; display: flex; align-items: center; padding: 0 12px 0 14px; gap: 8px; min-width: 0; }
+      .field .val { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .cta { height: 54px; padding: 0 22px; border-radius: 16px; background: var(--ink); color: #fff; font-weight: 800; display: grid; place-items: center; white-space: nowrap; }
+      .terms { margin: 9px 0 0; font-size: 12px; color: var(--muted); }
+      .proof { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; font-weight: 700; font-size: 14px; }
+      .proof span { display: flex; align-items: center; gap: 6px; }
+      .proof i { width: 20px; height: 20px; border: 2px solid var(--ink); border-radius: 50%; background: var(--mint); display: grid; place-items: center; font-style: normal; font-size: 11px; }
+
+      /* ---- the compact result card ---- */
+      .card { position: relative; border-radius: 22px; padding: 12px; width: 100%; max-width: 480px; justify-self: end; margin-top: 14px; }
+      .tag { position: absolute; top: -15px; left: 16px; transform: rotate(-3deg); border: 3px solid var(--ink); border-radius: 12px; padding: 1px 10px; font-weight: 800; font-size: 13px; z-index: 2; background: var(--mint); }
+      .media { position: relative; border: 3px solid var(--ink); border-radius: 14px; overflow: hidden; background: #000; }
+      .media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+      .media.wide { aspect-ratio: 16 / 9; }
+      .media.tall { aspect-ratio: 9 / 16; }
+      .media.square { aspect-ratio: 1; }
+      .chip { position: absolute; right: 7px; bottom: 7px; background: rgb(22 22 22 / 0.85); color: #fff; font-size: 12px; font-weight: 800; border-radius: 7px; padding: 1px 7px; }
+      .title { margin: 0; font-weight: 800; font-size: 16px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .by { margin: 3px 0 0; font-size: 13px; color: var(--muted); }
+      .acts { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 13px; font-weight: 800; }
+      .acts span { display: inline-flex; align-items: center; gap: 5px; text-decoration: underline; text-underline-offset: 3px; }
+      .acts .ic { width: 15px; height: 15px; }
+      .acts .clear { margin-left: auto; color: var(--muted); }
+      /* side layout: tall or square picture left, everything else right */
+      .side { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; align-items: start; }
+      .side.music { grid-template-columns: 112px minmax(0, 1fr); }
+      .top { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 12px; align-items: center; margin-bottom: 10px; }
+      /* tabs, small */
+      .tabs { display: flex; gap: 6px; margin: 10px 0 8px; }
+      .tabs span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border: 3px solid var(--ink); border-radius: 12px; padding: 5px; font-weight: 800; font-size: 14px; }
+      .tabs .on { background: var(--pop); }
+      .tabs .ic { width: 15px; height: 15px; }
+      /* quality grid */
+      .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+      .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .q { position: relative; overflow: hidden; display: flex; align-items: center; gap: 6px; padding: 7px 8px 7px 10px; border: 3px solid var(--ink); border-radius: 12px; background: #fff; min-width: 0; }
+      .q div { flex: 1; min-width: 0; position: relative; }
+      .q b { display: block; font-size: 15px; line-height: 1.15; white-space: nowrap; }
+      .q small { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .q .dl { position: relative; width: 26px; height: 26px; flex: none; border: 2px solid var(--ink); border-radius: 50%; background: var(--mint); display: grid; place-items: center; font-size: 9px; font-weight: 800; }
+      .q .dl .ic { width: 13px; height: 13px; }
+      .q.best { background: #eafbf3; }
+      .q.busy::before { content: ''; position: absolute; inset: 0 40% 0 0; background: repeating-linear-gradient(45deg, var(--pop-soft) 0 7px, #ffdfe9 7px 14px); }
+      .q.busy .dl { background: #fff; }
+      .q.done .dl { background: var(--ink); color: var(--mint); }
+      .q.vlc small::after { content: ' · VLC'; }
+      .note { margin: 8px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
+      .switch { margin: 9px 0 0; text-align: center; font-weight: 800; font-size: 13.5px; text-decoration: underline; text-underline-offset: 3px; }
+      .save { margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 7px; height: 44px; border: 3px solid var(--ink); border-radius: 14px; background: var(--mint); font-weight: 800; }
+      .below { margin: 0 30px 30px; border-radius: 24px; padding: 22px 24px; }
+      .below h2 { margin: 0 0 6px; font-size: 26px; }
+      .below p { margin: 0; color: var(--muted); }
+      /* phones */
+      .phones { max-width: 1720px; margin: 0 auto; padding: 12px 24px 40px; display: flex; gap: 26px; flex-wrap: wrap; }
+      .ph-frame { width: 390px; height: 780px; border-radius: 28px; overflow: hidden; border: 8px solid #111; box-shadow: 0 10px 30px rgb(0 0 0 / 0.18); background: #ffd43b; }
+      .ph-frame .app { width: 374px; }
+      .m .menu { display: none; }
+      .m .hdr { padding: 12px 14px 0; }
+      .m .hero { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 14px; }
+      .m h1 { font-size: 34px; }
+      .m .lead { font-size: 15px; }
+      .m .cta { padding: 0 16px; }
+      .m .card { max-width: none; margin: 6px 0 0; }
+      .m .side { grid-template-columns: 116px minmax(0, 1fr); gap: 11px; }
+      .m .top { grid-template-columns: 130px minmax(0, 1fr); }
+      .m .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .m .side .grid { grid-template-columns: minmax(0, 1fr); }
+      .m .side .tabs b { display: none; }
+      .m .below { margin: 0 14px 20px; padding: 16px; }
+    </style>
+  </head>
+  <body>
+    <header class="mock-head">
+      <h1>Option L: compact result card (same size whatever the video)</h1>
+      <p>
+        Qualities are now a <b>grid of small buttons</b> (quality + size) instead of a long list, so 8 qualities fit in
+        3 short rows: no "Show all", no page jump. The card copies the example card's shape: <b>Shorts</b> get a tall
+        picture on the left with everything beside it, <b>MP3</b> a square cover, <b>videos</b> a smaller wide picture
+        next to the title. The best pick is light green. Tapping a button fills it as a progress bar, then it turns into
+        a check. Header now: Video downloader, YouTube to MP3, Shorts, Thumbnail. <a href="index.html">Back to all options</a>
+      </p>
+    </header>
+
+    <h2 class="group-title">Desktop<small>1. Shorts · 2. Video (home) · 3. Downloading · 4. MP3 page · 5. Thumbnail page · 6. Long video with 8 qualities</small></h2>
+    <div class="stack" id="desk"></div>
+    <h2 class="group-title">Phones<small>Shorts, video, MP3: card right under the link box</small></h2>
+    <div class="phones" id="phones"></div>
+
+    <script>
+      document.body.insertAdjacentHTML('afterbegin', window.ICON_SPRITE);
+      const ic = (id) => `<svg class="ic"><use href="#${id}"/></svg>`;
+      const MENU = ['Video downloader', 'YouTube to MP3', 'Shorts downloader', 'Thumbnail downloader'];
+      const hdr = (cur, mobile) => `<div class="hdr"><div class="brand"><span class="logo">${ic('i-download-simple')}</span>YTPocket</div>
+          <nav class="menu">${MENU.map((m) => `<span${m === cur ? ' class="cur"' : ''}>${m}</span>`).join('')}</nav>
+          <div class="hdr-end"><span class="ibtn">${ic('i-moon')}</span>${mobile ? `<span class="ibtn">${ic('i-list')}</span>` : ''}</div></div>`;
+      // [name, size, state]: state = best | busy | done | vlc
+      const q = ([name, size, st]) =>
+        `<div class="q${st ? ' ' + st : ''}"><div><b>${name}</b><small>${st === 'busy' ? 'Saving 58%' : st === 'done' ? 'Saved' : size}</small></div><span class="dl">${st === 'busy' ? '58%' : st === 'done' ? ic('i-check') : ic('i-download-simple')}</span></div>`;
+      const grid = (rows, cls = '') => `<div class="grid ${cls}">${rows.map(q).join('')}</div>`;
+      const tabs = `<div class="tabs"><span class="on">${ic('i-video-camera')}Video<b>&nbsp;MP4</b></span><span>${ic('i-music-notes')}<b>Audio&nbsp;</b>MP3</span></div>`;
+      const acts = (save = 'Save thumbnail') => `<div class="acts"><span>${ic('i-image')}${save}</span><span class="clear">Clear</span></div>`;
+
+      const SHORT_Q = [['1080p', '41 MB', 'best'], ['720p', '25 MB'], ['480p', '5.6 MB'], ['360p', '4.0 MB']];
+      const cards = {
+        short: `<aside class="card box"><span class="tag">Your video</span><div class="side">
+            <div class="media tall"><img src="img/spring-tall.jpg" alt=""><span class="chip">1:00</span></div>
+            <div><p class="title">GTA 6 Downloaded 🔥</p><p class="by">Muneeb Bhai Gaming, 1:00</p>${acts()}${tabs}${grid(SHORT_Q, 'two')}
+            <p class="note">+ 3 smaller sizes</p></div></div></aside>`,
+        video: (busy) => `<aside class="card box"><span class="tag">Your video</span>
+            <div class="top"><div class="media wide"><img src="img/sintel-wide.jpg" alt=""><span class="chip">14:48</span></div>
+            <div><p class="title">Sintel - Open Movie by Blender Foundation</p><p class="by">Blender, 14:48</p>${acts()}</div></div>
+            ${tabs}${grid([['1080p', '228 MB', busy ? 'busy' : 'best'], ['720p', '176 MB', busy ? 'done' : ''], ['480p', '70 MB'], ['360p', '47 MB'], ['240p', '32 MB'], ['144p', '18 MB']])}</aside>`,
+        mp3: `<aside class="card box"><span class="tag">Your video</span><div class="side music">
+            <div class="media square"><img src="img/sintel-square.jpg" alt=""></div>
+            <div><p class="title">Sintel - Open Movie by Blender Foundation</p><p class="by">Blender, 14:48</p>${acts('Save cover')}</div></div>
+            <div style="margin-top:12px">${grid([['MP3 192', '20 MB', 'best'], ['MP3 128', '14 MB'], ['M4A original', '14 MB']])}</div>
+            <p class="switch">Want the video? Use the Video downloader</p></aside>`,
+        thumb: `<aside class="card box"><span class="tag">Your video</span>
+            <div class="media wide"><img src="img/sintel-wide.jpg" alt=""></div>
+            <div class="acts" style="margin-top:10px"><p class="title" style="flex:1">Sintel - Open Movie by Blender Foundation</p><span class="clear">Clear</span></div>
+            <div class="save">${ic('i-image')}Save thumbnail · 480 × 270 JPG</div></aside>`,
+        long: `<aside class="card box"><span class="tag">Your video</span>
+            <div class="top"><div class="media wide"><img src="img/bunny-wide.jpg" alt=""><span class="chip">10:35</span></div>
+            <div><p class="title">Big Buck Bunny 60fps 4K - Official Blender Foundation Short Film</p><p class="by">Blender, 10:35</p>${acts()}</div></div>
+            ${tabs}${grid([['4K 60', '1.3 GB', 'vlc'], ['2K 60', '461 MB', 'vlc'], ['1080p 60', '255 MB', 'best'], ['720p 60', '153 MB'], ['480p', '37 MB'], ['360p', '27 MB'], ['240p', '19 MB'], ['144p', '14 MB']])}
+            <p class="note">4K and 2K play in browsers and VLC; 1080p and below play everywhere.</p></aside>`,
+      };
+
+      const page = ({ cur, crumb, h1, lead, cta, card, url, mobile, proof }) => `<div class="app${mobile ? ' m' : ''}">${hdr(cur, mobile)}
+          <section class="hero"><div>
+            ${crumb ? `<div style="font-size:13px;font-weight:700;color:#55524a;margin-bottom:10px">Home › <b style="color:#161616">${crumb}</b></div>` : ''}
+            <h1>${h1}</h1><p class="lead">${lead}</p>
+            <div class="tool box"><div class="intake"><div class="field"><span class="val">${url}</span>✕</div><div class="cta">${cta}</div></div>
+              <p class="terms">By using YTPocket you accept the <u>Terms</u> and <u>Privacy Policy</u>.</p></div>
+            <div class="proof">${(proof || ['Works on iPhone and Android', 'No app to install', 'Files deleted in 15 min']).map((t) => `<span><i>✓</i>${t}</span>`).join('')}</div>
+          </div>${card}</section>
+          <section class="below box"><h2>How to download on any device</h2><p>The guides, sizes, fixes and FAQ stay below, as now…</p></section></div>`;
+
+      const SH = { cur: 'Shorts downloader', crumb: 'Shorts downloader', h1: 'Download YouTube Shorts', lead: 'Save Shorts as vertical MP4 or MP3.', cta: 'Get video', url: 'https://youtube.com/shorts/bCIMDznM_ek', proof: ['Stays vertical', 'No app to install', 'Files deleted in 15 min'] };
+      const HOME = { cur: 'Video downloader', h1: 'Download YouTube videos and MP3', lead: 'Free. No sign-up. MP4 up to 4K or MP3.', cta: 'Get video', url: 'https://youtu.be/eRsGyueVLvQ' };
+      const MP3 = { cur: 'YouTube to MP3', crumb: 'YouTube to MP3', h1: 'YouTube to MP3 downloader', lead: 'Download the sound of any YouTube video as an MP3.', cta: 'Get MP3', url: 'https://youtu.be/eRsGyueVLvQ', proof: ['Title and cover art built in', 'No app to install', 'Files deleted in 15 min'] };
+      const TH = { cur: 'Thumbnail downloader', crumb: 'Thumbnail downloader', h1: 'YouTube thumbnail downloader', lead: 'Save the cover image of any video in HD.', cta: 'Get thumbnail', url: 'https://youtu.be/eRsGyueVLvQ' };
+      const desks = [
+        { ...SH, card: cards.short },
+        { ...HOME, card: cards.video(false) },
+        { ...HOME, card: cards.video(true) },
+        { ...MP3, card: cards.mp3 },
+        { ...TH, card: cards.thumb },
+        { ...HOME, url: 'https://youtu.be/aqz-KE-bpKQ', card: cards.long },
+      ];
+      const dh = document.getElementById('desk');
+      for (const d of desks) dh.insertAdjacentHTML('beforeend', `<div class="desk">${page(d)}</div>`);
+
+      const ph = document.getElementById('phones');
+      const shot = (html, y) => {
+        const f = document.createElement('div');
+        f.className = 'ph-frame';
+        f.innerHTML = `<div style="transform:translateY(-${y}px)">${html}</div>`;
+        ph.append(f);
+      };
+      shot(page({ ...SH, card: cards.short, mobile: true }), 330);
+      shot(page({ ...HOME, card: cards.video(true), mobile: true }), 330);
+      shot(page({ ...MP3, card: cards.mp3, mobile: true }), 330);
+    </script>
+  </body>
+</html>
