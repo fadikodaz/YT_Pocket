@@ -64,7 +64,8 @@ const STORE_KEY = 'ytpocket.session.v1';
 // "Cut a part" is switched off until it gets a proper timeline UI (frames +
 // drag handles). The server side keeps supporting start/end.
 const CUT_ENABLED = false;
-const ACTIVE = new Set(['creating', 'queued', 'downloading', 'processing']);
+// 'waiting' and 'streaming' are live MP3 streams (the browser is downloading).
+const ACTIVE = new Set(['creating', 'queued', 'downloading', 'processing', 'waiting', 'streaming']);
 
 const state = {
   info: null, // current /api/info response
@@ -803,6 +804,19 @@ function describe(job) {
         sub: `${PROCESSING[v.kind] || 'Finishing'}. Tap to cancel`,
         tap: 'cancel',
       };
+    case 'waiting':
+      return { cls: 'busy indeterminate', icon: '…', sub: 'Starting your download. Tap to cancel', tap: 'cancel' };
+    case 'streaming': {
+      const est = Number(v.estimatedSize) || 0;
+      const pct = est ? Math.min(99, Math.floor((Number(v.bytes) / est) * 100)) : null;
+      return {
+        cls: pct == null ? 'busy indeterminate' : 'busy',
+        pct,
+        icon: pct == null ? '…' : `${pct}%`,
+        sub: `Saving to your device, ${fmtBytes(v.bytes)}. Tap to cancel`,
+        tap: 'cancel',
+      };
+    }
     case 'ready':
       return {
         cls: 'done',
@@ -867,6 +881,8 @@ function jobBody(job) {
   else if (job.value.startsWith('video:')) Object.assign(body, { format: 'video', height: Number(job.value.slice(6)) });
   else Object.assign(body, { format: 'mp3', quality: Number(job.value.slice(4)) || 192 });
   if (job.cut) Object.assign(body, { start: job.cut.start, end: job.cut.end });
+  // MP3s stream: the browser's download starts right away (server decides).
+  else if (body.format === 'mp3') body.stream = true;
   return body;
 }
 
@@ -936,7 +952,21 @@ function applyView(job, view) {
   }
 
   job.phase = view.status;
+  if (view.stream) job.stream = true;
   update(job);
+
+  if (job.stream) {
+    if (view.status === 'waiting' && !job.saved) openStream(job);
+    if (view.status === 'ready') {
+      if (!job.toasted) {
+        job.toasted = true;
+        toast(`${view.filename || 'Your MP3'} (${fmtBytes(view.size)})`, { title: 'Saved to your Downloads' });
+        announce(`${job.label} saved to your downloads`);
+      }
+      return;
+    }
+    return schedulePoll(job);
+  }
 
   if (view.status === 'ready') {
     stopWatching(job);
@@ -954,6 +984,7 @@ function applyView(job, view) {
 // stream ever breaks (proxy, network change) this job switches to polling.
 function watch(job) {
   if (job.es) return;
+  if (job.stream) return schedulePoll(job);
   if (!('EventSource' in window) || job.noStream) return schedulePoll(job);
   const es = new EventSource(`/api/jobs/${encodeURIComponent(job.id)}/events`);
   job.es = es;
@@ -1005,6 +1036,21 @@ async function poll(job) {
     if (job.fails > 12) return fail(job, { message: 'Lost connection to the server.' });
     job.timer = setTimeout(() => poll(job), Math.min(8000, 800 * 2 ** Math.min(job.fails, 4)));
   }
+}
+
+// Live MP3: the browser downloads it while the server makes it. The row
+// follows the progress by polling.
+function openStream(job) {
+  job.saved = true;
+  const a = h('a', {
+    href: `/api/jobs/${encodeURIComponent(job.id)}/file`,
+    download: job.view?.filename || '',
+    hidden: true,
+  });
+  document.body.append(a);
+  a.click();
+  setTimeout(() => a.remove(), 1000);
+  announce(`${job.label} is downloading`);
 }
 
 async function saveFile(job, manual) {

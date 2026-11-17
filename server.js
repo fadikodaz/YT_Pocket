@@ -22,6 +22,7 @@ const ffmpegPath = require('ffmpeg-static');
 const ytdlp = require('./lib/ytdlp');
 const { TTLMap } = require('./lib/cache');
 const { JobManager } = require('./lib/jobs');
+const { StreamManager } = require('./lib/stream');
 const { fetchImage } = require('./lib/safefetch');
 const { buildPages, pageForSite } = require('./lib/pages');
 
@@ -57,6 +58,29 @@ const jobs = new JobManager({
   minFreeBytes: env('MIN_FREE_DISK_MB', 1024) * 1024 * 1024,
 });
 jobs.init();
+
+// Live MP3 streams (lib/stream.js): the browser's download starts at once.
+// STREAM_MP3=0 turns them off (MP3s are then prepared as files first).
+const STREAM_MP3 = process.env.STREAM_MP3 !== '0';
+const streams = new StreamManager({
+  ffmpeg: jobs.ffmpeg,
+  maxStreams: env('STREAMS_MAX', 4),
+  perIp: env('STREAMS_PER_IP_ACTIVE', 2),
+  timeoutMs: env('JOB_TIMEOUT_MS', 30 * 60 * 1000),
+});
+
+// Cover for a streamed MP3: the video's thumbnail, if it comes quickly.
+async function coverFor(spec) {
+  try {
+    const img = await Promise.race([
+      getThumbnail(spec.url, spec.info),
+      new Promise((resolve) => setTimeout(() => resolve(null), 6000)),
+    ]);
+    return img?.buffer || null;
+  } catch {
+    return null;
+  }
+}
 
 // Limit concurrent metadata extractions (each one is a 50-150 MB yt-dlp
 // process). Extra requests wait in a short queue; beyond that we answer BUSY.
@@ -739,6 +763,19 @@ app.post('/api/jobs', rateLimit({ max: 20 }), async (req, res) => {
   try {
     const ip = clientIp(req);
     const spec = await buildSpec(req.body, ip);
+    // MP3 without a cut can be streamed: the browser then downloads it
+    // while it's being made (see lib/stream.js).
+    if (STREAM_MP3 && req.body?.stream === true && spec.kind === 'mp3' && !spec.cut && spec.parts?.[0]?.id) {
+      const data = spec.info || {};
+      Object.assign(spec, {
+        sourceFormat: spec.parts[0].id,
+        artist: data.artist || data.uploader || data.channel || '',
+        estimatedOutput: ytdlp.estimateSize(spec.duration, spec.quality),
+      });
+      const s = streams.create(spec, ip, coverFor(spec)); // cover arrives while the browser connects
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(202).json(streams.view(s));
+    }
     const job = jobs.create(spec, ip);
     res.setHeader('Cache-Control', 'no-store');
     res.status(202).json(jobs.view(job));
@@ -753,8 +790,10 @@ app.post('/api/jobs', rateLimit({ max: 20 }), async (req, res) => {
 const pollLimit = rateLimit({ max: 400 });
 
 app.get('/api/jobs/:id', pollLimit, (req, res) => {
-  const job = jobs.get(req.params.id);
   res.setHeader('Cache-Control', 'no-store');
+  const s = streams.get(req.params.id);
+  if (s) return res.json(streams.view(s));
+  const job = jobs.get(req.params.id);
   if (!job) {
     return res.status(404).json({
       error: 'This download expired. Please start it again.',
@@ -847,12 +886,25 @@ app.get('/api/jobs/:id/events', pollLimit, (req, res) => {
 });
 
 app.delete('/api/jobs/:id', pollLimit, (req, res) => {
+  const s = streams.get(req.params.id);
+  if (s && s.ip === clientIp(req)) streams.cancel(s);
   const job = jobs.get(req.params.id);
   if (job) jobs.cancel(job, clientIp(req));
   res.status(204).end();
 });
 
 app.get('/api/jobs/:id/file', rateLimit({ max: 60 }), (req, res) => {
+  const s = streams.get(req.params.id);
+  if (s) {
+    // HEAD (the page checking whether a file is still there): a stream can
+    // only be opened once.
+    if (req.method === 'HEAD') return res.status(s.status === 'waiting' ? 200 : 404).end();
+    const disposition = (name) => contentDisposition(name, { fallback: asciiFallback(name) });
+    return streams.serve(s, res, sendError, disposition).catch((e) => {
+      console.error('[stream]', e.message);
+      if (!res.headersSent) sendError(res, ytdlp.err('UNKNOWN'));
+    });
+  }
   const job = jobs.get(req.params.id);
   if (!job || job.status !== 'ready' || !jobs.fileExists(job)) {
     return res.status(404).json({
